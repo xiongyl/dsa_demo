@@ -1,0 +1,171 @@
+<html>
+<head>   
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+<title>AVL demo</title>   
+<link href="avl.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div id="input" align="center">
+<select id="svgnum">
+	<option>1</option>
+	<option selected>2</option>
+	<option>3</option>
+	<option>4</option>
+</select>
+<label> step(s) in screen</label>
+<button id="startButton">Start</button>
+<p>
+<button id="history">History</button>
+</p>
+<p hidden="true">
+<label> add <label>
+<input id="randomSize" type="text"></input>
+<label> number(s)</label>
+<button id="randomButton">Random</button>
+</p>
+<p hidden="true">insert/delete number(s), several numbers should be split by space</p>
+<p>
+<input id="num" type="text" maxlength="100" autocomplete="off"></input>
+<button id="insert">Insert</button>
+<button id="delete">Delete</button>
+</p>
+</div>
+<p></p>
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="d3.v3.min.js"></script>
+<script type="text/javascript" src="avl.js"></script>
+<script type="text/javascript" src="draw.js"></script>
+<script type="text/javascript">
+	var drawy = 50;
+	var initRandomSize = 10;
+	var avltree, choose, drawroot, history, svg, svgnum;
+	var divsvg = [];
+	start();
+	function randomData() {
+		var nodeNum = parseInt($('#randomSize').val());
+		if (isNaN(nodeNum) || nodeNum < 0) {
+			nodeNum = 0;
+		}
+		$('#randomSize')[0].value = nodeNum;
+		if (nodeNum == 0) return;
+		var output = "insert: ";
+		for (var i = 0; i < nodeNum; ++i) {
+			var num = Math.ceil(Math.random() * 100);
+			avltree.insert(num);
+			output += num + " ";
+		}
+		if (drawroot[choose] != null) {
+			drawroot[choose].remove();
+		}
+		drawroot[choose] = drawAvl(avltree.root);
+		drawroot[choose].draw(svg[choose], document.width / svgnum * 0.5, drawy);
+		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
+		choose = (choose + 1) % svgnum;
+		history += output + "\n";
+	};
+	
+	$("#insert").click(function() {
+		$("#svgnum")[0].value = svgnum;
+		var input = $("#num").val();
+		$("#num")[0].value = "";
+		if (input == null) return;
+		input = input.split(" ");
+		var output = "insert: ";
+		var empty = true;
+		for (var i = 0; i < input.length; ++i) {
+			var num = parseInt(input[i]);
+			if (!isNaN(num)) {
+				avltree.insert(num);
+				output += num + " ";
+				empty = false;
+			}
+		}
+		if (empty) {
+			return;
+		}
+		if (drawroot[choose] != null) {
+			drawroot[choose].remove();
+		}
+		drawroot[choose] = drawAvl(avltree.root);
+		drawroot[choose].draw(svg[choose], document.width / svgnum * 0.5, drawy);
+		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
+		choose = (choose + 1) % svgnum;
+		history += output + "\n";
+	})
+
+	$("#delete").click(function() {
+		$("#svgnum")[0].value = svgnum;
+		var input = $("#num").val();
+		$("#num")[0].value = "";
+		if (input == null) return;
+		input = input.split(" ");
+		var output = "delete: ";
+		var empty = true;
+		for (var i = 0; i < input.length; ++i) {
+			var num = parseInt(input[i]);
+			if (!isNaN(num)) {
+				avltree.remove(num);
+				output += num + " ";
+				empty = false;
+			}
+		}
+		if (empty) return;
+		if (drawroot[choose] != null) {
+			drawroot[choose].remove();
+		}
+		drawroot[choose] = drawAvl(avltree.root);
+		drawroot[choose].draw(svg[choose], document.width / svgnum * 0.5, drawy);
+		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
+		choose = (choose + 1) % svgnum;
+		history += output + "\n"
+	})
+
+	function drawAvl(node) {
+		if (node == avltree.nullptr) return null;
+		var left = drawAvl(node.left);
+		var right = drawAvl(node.right);
+		var root = new Node(node.value);
+		if (left != null) root.appendleft(left);
+		if (right != null) root.appendright(right);
+		return root;
+	}
+
+	function start() {
+		svgnum = $('#svgnum').val();
+		for (var i = 0; i < divsvg.length; ++i) {
+			divsvg[i].remove();
+		}
+		for (var i = 0; i < svgnum; ++i) {
+			$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"><p></p></div>');
+		}
+		divsvg = $('.divsvg');
+		var style = "50%"
+		switch(svgnum) {
+			case "1": style = "100%"; break;
+			case "3": style = "33%"; break;
+			case "4": style = "25%"; break;
+			case "5": style = "20%"; break;
+		}
+		avltree = Avl();
+		choose = 0;
+		drawroot = [];
+		svg = [];
+		history = "";
+		for (var i = 0; i < divsvg.length; ++i) {
+			divsvg[i].style.width = style;
+			svg.push(d3.select('#divsvg'+i).append('svg'));
+		}
+		$('#randomSize')[0].value = Math.ceil(initRandomSize / svgnum);
+		randomData();
+	}
+	$("#svgnum").change(start);$("#startButton").hide();
+	//$("#startButton").click(start);
+	$("#randomButton").click(randomData);
+	$("#history").click(function() {
+		alert(history);
+	});
+</script>
+</body>
+</html>
