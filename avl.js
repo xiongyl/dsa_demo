@@ -55,7 +55,7 @@ function Avl() {
 			else if (node.isRight()) node.father.right = u;
 			u.father = node.father;
 			node.father = u;
-			if (node.left == my.nullptr) node.left.father = node;
+			if (node.left != my.nullptr) node.left.father = node;
 
 			node.update();
 			u.update();
@@ -74,7 +74,7 @@ function Avl() {
 			else if (node.isRight()) node.father.right = u;
 			u.father = node.father;
 			node.father = u;
-			if (node.right == my.nullptr) node.right.father = node;
+			if (node.right != my.nullptr) node.right.father = node;
 
 			node.update();
 			u.update();
@@ -103,11 +103,15 @@ function Avl() {
 			if (u.left == v)
 				if (v.left == w) 
 					return u.zig();
-				else
-					return v.zag().zig();
+				else {
+					v.zag();
+					return u.zig();
+				}
 			else
-				if (v.left == w)
-					return v.zig().zag();
+				if (v.left == w) {
+					v.zig();
+					return u.zag();
+				}
 				else
 					return u.zag();
 		}
