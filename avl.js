@@ -1,10 +1,3 @@
-/*
- * avl.js
- * Copyright (C) 2013 mlckq <moon5ckq@gmail.com>
- *
- * Distributed under terms of the MIT license.
- */
-
 function Avl() {
 	var my = {
 		root : null,
