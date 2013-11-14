@@ -59,9 +59,9 @@ Node.prototype = {
 			this.element.append("circle")
 						.attr("r", 20)
 						.style("fill", "#CCC")
-			this.element.append("text")
-				.text(this.value)
-				.style("fill", "black");
+			txt = this.element.append("text")
+				.text(this.value);
+			txt.style("fill", "black");
 		}
 	},
 	remove: function() {

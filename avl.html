@@ -18,10 +18,11 @@
 <button id="history">History</button>
 </p>
 <p>
-<button id="random" onclick="$('#num')[0].value = Math.ceil(Math.random() * 100)">Random</button>
 <input id="num" type="text" maxlength="100" autocomplete="off"></input>
+<button id="random" onclick="$('#num')[0].value = Math.ceil(Math.random() * 100)">Random</button>
 <button id="insert">Insert</button>
 <button id="delete">Delete</button>
+<button id="find">Find</button>
 </p>
 </div>
 <p></p>
@@ -38,21 +39,23 @@
 	var divsvg = [];
 	start();
 	
-	$("#insert").click(function() {
+	function func(op) {
 		$("#svgnum")[0].value = svgnum;
 		var input = $("#num").val();
 		$("#num")[0].value = "";
 		if (input == null) return;
 		input = input.split(" ");
-		var output = "insert: ";
+		var opRecord = op + ": ";
 		var empty = true;
 		for (var i = 0; i < input.length; ++i) {
 			var num = parseInt(input[i]);
 			if (!isNaN(num)) {
-				avltree.insert(num);
-				output += num + " ";
+				if (op == "Insert") avltree.insert(num);
+				if (op == "Delete") avltree.remove(num);
+				if (op == "Find") avltree.find(num);
+				opRecord += num + " ";
 				empty = false;
-				break;//comment this to make it available to insert many numbers once
+				break;//comment this to make it available to deal with many numbers once
 			}
 		}
 		if (empty) {
@@ -62,42 +65,28 @@
 			drawroot[choose].remove();
 		}
 		drawroot[choose] = genDrawingTree(avltree.root);
-		drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
-		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
+		if (drawroot[choose] != null) {
+			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+		}
+		$('#process' + choose).html(avltree.process);
 		choose = (choose + 1) % svgnum;
-		history += output + "\n";
+		history += opRecord + "\n";
+	}
+	
+	$("#insert").click(function() {
+		func("Insert");
 	})
 
 	$("#delete").click(function() {
-		$("#svgnum")[0].value = svgnum;
-		var input = $("#num").val();
-		$("#num")[0].value = "";
-		if (input == null) return;
-		input = input.split(" ");
-		var output = "delete: ";
-		var empty = true;
-		for (var i = 0; i < input.length; ++i) {
-			var num = parseInt(input[i]);
-			if (!isNaN(num)) {
-				avltree.remove(num);
-				output += num + " ";
-				empty = false;
-				//comment this to make it available to delete many numbers once
-			}
-		}
-		if (empty) return;
-		if (drawroot[choose] != null) {
-			drawroot[choose].remove();
-		}
-		drawroot[choose] = genDrawingTree(avltree.root);
-		drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
-		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
-		choose = (choose + 1) % svgnum;
-		history += output + "\n"
+		func("Delete");
+	})
+	
+	$("#find").click(function() {
+		func("Find");
 	})
 
 	function genDrawingTree(node) {
-		if (node == avltree.nullptr) return null;
+		if (node == null) return null;
 		var left = genDrawingTree(node.left);
 		var right = genDrawingTree(node.right);
 		var root = new Node(node.value);
@@ -107,7 +96,7 @@
 	}
 
 	function randomData() {
-		var output = "insert: ";
+		var output = "Insert: ";
 		for (var i = 0; i < randomSize; ++i) {
 			var num = Math.ceil(Math.random() * 100);
 			avltree.insert(num);
@@ -117,7 +106,9 @@
 			drawroot[choose].remove();
 		}
 		drawroot[choose] = genDrawingTree(avltree.root);
-		drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+		if (drawroot[choose] != null) {
+			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+		}
 		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
 		choose = (choose + 1) % svgnum;
 		history += output + "\n";
@@ -129,7 +120,7 @@
 			divsvg[i].remove();
 		}
 		for (var i = 0; i < svgnum; ++i) {
-			$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"><p></p></div>');
+			$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');
 		}
 		divsvg = $('.divsvg');
 		var styleWidth = "50%"
@@ -147,6 +138,7 @@
 		for (var i = 0; i < divsvg.length; ++i) {
 			divsvg[i].style.width = styleWidth;
 			svg.push(d3.select('#divsvg'+i).append('svg'));
+			$('#divsvg'+i).append('<p class="process" id="process' + i + '"></p>');
 		}
 		randomSize = Math.ceil(initRandomSize / svgnum);
 		randomData();

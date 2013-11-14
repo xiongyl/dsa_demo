@@ -23,7 +23,7 @@ input {
 	-webkit-appearance: none;
 }
 button {
-	width: 95px;
+	width: 75px;
 	height: 32px;
 	font: 16px/22px arial;
 }
@@ -37,7 +37,11 @@ label {
 	width: 50%;
 	height: 50%;
 	float:left; 
-} 
+}
+.process {
+	font: 16px/22px arial;
+	text-align: center;
+}
 #svgnum {
 	font: 16px/22px arial;
 	width: 50px;
@@ -50,4 +54,12 @@ label {
 	margin: 5px 0 0 7px;
 	background: #fff;
 	outline: 0;
+}
+
+g text{
+	border: 0px solid #000000;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
 }
