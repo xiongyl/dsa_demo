@@ -1,12 +1,14 @@
 <html>
 <head>   
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
-<title>AVL demo</title>   
-<link href="avl.css" rel="stylesheet"/>
+<title>AVL tree demo</title>   
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /> 
+<link href="css/avl.css" rel="stylesheet"/>
 </head>
 
 <body>
 <div id="input" align="center">
+<h1>AVL tree demo</h1>
 <select id="svgnum">
 	<option>1</option>
 	<option selected>2</option>
@@ -16,8 +18,6 @@
 <label> step(s) in screen</label>
 <p>
 <button id="history">History</button>
-</p>
-<p>
 <input id="num" type="text" maxlength="100" autocomplete="off"></input>
 <button id="random" onclick="$('#num')[0].value = Math.ceil(Math.random() * 100)">Random</button>
 <button id="insert">Insert</button>
@@ -28,10 +28,10 @@
 </div>
 <p></p>
 
-<script type="text/javascript" src="jquery.min.js"></script>
-<script type="text/javascript" src="d3.v3.min.js"></script>
-<script type="text/javascript" src="avl.js"></script>
-<script type="text/javascript" src="draw.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/d3.v3.min.js"></script>
+<script type="text/javascript" src="js/avl.js"></script>
+<script type="text/javascript" src="js/draw.js"></script>
 <script type="text/javascript">
 	var drawy = 50;
 	var initRandomSize = 10;
