@@ -1,60 +1,78 @@
 function Node(value) {
 	this.left = null;
 	this.right = null;
+	this.father = null;
 	this.value = value;
 	this.element = null;
 };
 Node.prototype = {
 	appendleft: function(childNode) {
-		this.left = {
-			node: childNode,
-			line: null,
-		};
+		this.left = childNode;
+		childNode.father = this;
 	},
 	appendright: function(childNode) {
-		this.right = {
-			node: childNode,
-			line: null,
-		};
+		this.right = childNode;
+		childNode.father = this;
 	},
 	height: function() {
 		var h = 0;
 		if (this.left != null) {
-			h = Math.max(h, this.left.node.height() + 1);
+			h = Math.max(h, this.left.height() + 1);
 		}
 		if (this.right != null) {
-			h = Math.max(h, this.right.node.height() + 1);
+			h = Math.max(h, this.right.height() + 1);
 		}
 		return h;
 	},
+	isLeft: function() {
+		return this.father != null && this.father.left == this;
+	},
+	isRight: function() {
+		return this.father != null && this.father.right == this;
+	},
 	draw: function(svg, x, y) {
 		if (this.element == null) {
-			this.element = svg.append("g");
-			var interval = Math.pow(2, this.height()) * 30;
+			var baseInterval = 30 * 2;
+			var vlign = 40;
 			if (this.left != null) {
-				this.left.line = this.element.append("line")
-					.attr("x1", 0).attr("y1", 0)
-					.attr("x2", interval * (0 - 0.5))
-					.attr("y2", 40)
-					.attr("stroke-width", 2)
-					.attr("stroke", "black");
-				this.left.node.draw(svg, x + interval * (0 - 0.5), y + 40);
+				var leftInterval = Math.pow(2, this.left.height()) * baseInterval;
+				this.left.draw(svg, x + leftInterval * (0 - 0.5), y + vlign);
 			}
 			if (this.right != null) {
-				this.right.line = this.element.append("line")
+				var rightInterval = Math.pow(2, this.right.height()) * baseInterval;
+				this.right.draw(svg, x + rightInterval * (1 - 0.5), y + vlign);
+			}
+			this.element = svg.append("g");
+			if (this.father == null) {
+				this.element.append("line")
 					.attr("x1", 0).attr("y1", 0)
-					.attr("x2", interval * (1 - 0.5))
-					.attr("y2", 40)
+					.attr("x2", 0)
+					.attr("y2", -vlign)
 					.attr("stroke-width", 2)
 					.attr("stroke", "black");
-				this.right.node.draw(svg, x + interval * (1 - 0.5), y + 40);
+			}else {
+				var interval = Math.pow(2, this.height()) * baseInterval;
+				if (this.isLeft()) {
+					this.element.append("line")
+						.attr("x1", 0).attr("y1", 0)
+						.attr("x2", -interval * (0 - 0.5))
+						.attr("y2", -vlign)
+						.attr("stroke-width", 2)
+						.attr("stroke", "black");
+				}else{
+					this.element.append("line")
+						.attr("x1", 0).attr("y1", 0)
+						.attr("x2", -interval * (1 - 0.5))
+						.attr("y2", -vlign)
+						.attr("stroke-width", 2)
+						.attr("stroke", "black");
+				}
 			}
-			
 			this.element
 				.attr("transform", "translate(" + x + "," + y + ")")
 				.transition()
 				.duration(1000)
-				.delay(1000)
+				.delay(0)
 				.attr("transform", "translate(" + x + "," + (y + 50) + ")");
 			this.element.append("circle")
 						.attr("r", 20)
@@ -69,10 +87,10 @@ Node.prototype = {
 			this.element.remove();
 		}
 		if (this.left != null) {
-			this.left.node.remove();
+			this.left.remove();
 		}
 		if (this.right != null) {
-			this.right.node.remove();
+			this.right.remove();
 		}
 	}
 };

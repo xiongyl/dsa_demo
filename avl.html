@@ -69,12 +69,7 @@
 		}
 		drawroot[choose] = genDrawingTree(avltree.root);
 		if (drawroot[choose] != null) {
-			//if(op == "Clear") {
-				//drawroot[choose].deleteAll(svg[choose]);
-				//avltree.root = null;
-			//}else {
-				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
-			//}
+			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
 		}
 		$('#process' + choose).html(avltree.process);
 		choose = (choose + 1) % svgnum;
