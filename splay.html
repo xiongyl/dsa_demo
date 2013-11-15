@@ -1,13 +1,13 @@
 <html>
 <head>   
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
-<title>AVL Tree Demo</title>   
+<title>Spaly Tree Demo</title>   
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /> 
 <link href="css/avl.css" rel="stylesheet"/>
 </head>
 
 <body>
-<h1 align="center">AVL Tree Demo</h1>
+<h1 align="center">Splay Tree Demo</h1>
 <div id="input" align="center">
 	<select id="svgnum">
 		<option>1</option>
@@ -31,13 +31,13 @@
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/treenode.js"></script>
-<script type="text/javascript" src="js/avl.js"></script>
+<script type="text/javascript" src="js/splay.js"></script>
 <script type="text/javascript" src="js/draw.js"></script>
 <script type="text/javascript">
 	var drawy = 50;
 	var initRandomSize = 10;
 	var randomSize = Math.ceil(initRandomSize / $("#svgnum")[0].value);
-	var avltree, choose, drawroot, history, svg, svgnum;
+	var splaytree, choose, drawroot, history, svg, svgnum;
 	var divsvg = [];
 	start();
 	
@@ -53,10 +53,10 @@
 		for (var i = 0; i < input.length; ++i) {
 			var num = parseInt(input[i]);
 			if (!isNaN(num)) {
-				if (op == "Insert") avltree.insert(num);
-				if (op == "Delete") avltree.remove(num);
-				if (op == "Find") avltree.find(num);
-				if (op == "Clear") avltree.deleteAll();
+				if (op == "Insert") splaytree.insert(num);
+				if (op == "Delete") splaytree.remove(num);
+				if (op == "Find") splaytree.find(num);
+				if (op == "Clear") splaytree.deleteAll();
 				opRecord += num + " ";
 				empty = false;
 				break;//comment this to make it available to deal with many numbers once
@@ -68,11 +68,11 @@
 		if (drawroot[choose] != null) {
 			drawroot[choose].remove();
 		}
-		drawroot[choose] = genDrawingTree(avltree.root);
+		drawroot[choose] = genDrawingTree(splaytree.root);
 		if (drawroot[choose] != null) {
 			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
 		}
-		$('#process' + choose).html(avltree.process);
+		$('#process' + choose).html(splaytree.process);
 		choose = (choose + 1) % svgnum;
 		history += opRecord + "\n";
 	}
@@ -107,13 +107,13 @@
 		var output = "Insert: ";
 		for (var i = 0; i < randomSize; ++i) {
 			var num = Math.ceil(Math.random() * 100);
-			avltree.insert(num);
+			splaytree.insert(num);
 			output += num + " ";
 		}
 		if (drawroot[choose] != null) {
 			drawroot[choose].remove();
 		}
-		drawroot[choose] = genDrawingTree(avltree.root);
+		drawroot[choose] = genDrawingTree(splaytree.root);
 		if (drawroot[choose] != null) {
 			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
 		}
@@ -138,7 +138,7 @@
 			case "4": styleWidth = "25%"; break;
 			case "5": styleWidth = "20%"; break;
 		}
-		avltree = Avl();
+		splaytree = Splay();
 		choose = 0;
 		drawroot = [];
 		svg = [];

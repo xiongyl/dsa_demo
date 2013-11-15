@@ -4,6 +4,8 @@ function Node(value) {
 	this.father = null;
 	this.value = value;
 	this.element = null;
+	this.hlignl = null;
+	this.hlignr = null;
 };
 Node.prototype = {
 	appendleft: function(childNode) {
@@ -30,16 +32,20 @@ Node.prototype = {
 	isRight: function() {
 		return this.father != null && this.father.right == this;
 	},
+	isLeaf: function() {
+		return this.left == null && this.right == null;
+	},
 	draw: function(svg, x, y) {
+		this.getHlign();
 		if (this.element == null) {
 			var baseInterval = 30 * 2;
 			var vlign = 40;
 			if (this.left != null) {
-				var leftInterval = Math.pow(2, this.left.height()) * baseInterval;
+				var leftInterval = this.left.hlignr * baseInterval;
 				this.left.draw(svg, x + leftInterval * (0 - 0.5), y + vlign);
 			}
 			if (this.right != null) {
-				var rightInterval = Math.pow(2, this.right.height()) * baseInterval;
+				var rightInterval = this.right.hlignl * baseInterval;
 				this.right.draw(svg, x + rightInterval * (1 - 0.5), y + vlign);
 			}
 			this.element = svg.append("g");
@@ -51,8 +57,8 @@ Node.prototype = {
 					.attr("stroke-width", 2)
 					.attr("stroke", "black");
 			}else {
-				var interval = Math.pow(2, this.height()) * baseInterval;
 				if (this.isLeft()) {
+					var interval = this.hlignr * baseInterval;
 					this.element.append("line")
 						.attr("x1", 0).attr("y1", 0)
 						.attr("x2", -interval * (0 - 0.5))
@@ -60,6 +66,7 @@ Node.prototype = {
 						.attr("stroke-width", 2)
 						.attr("stroke", "black");
 				}else{
+					var interval = this.hlignl * baseInterval;
 					this.element.append("line")
 						.attr("x1", 0).attr("y1", 0)
 						.attr("x2", -interval * (1 - 0.5))
@@ -75,7 +82,7 @@ Node.prototype = {
 				.delay(0)
 				.attr("transform", "translate(" + x + "," + (y + 50) + ")");
 			this.element.append("circle")
-						.attr("r", 20)
+						.attr("r", 18)
 						.style("fill", "#CCC")
 			txt = this.element.append("text")
 				.text(this.value);
@@ -91,6 +98,21 @@ Node.prototype = {
 		}
 		if (this.right != null) {
 			this.right.remove();
+		}
+	},
+	getHlign: function() {
+		if (this.hlignl != null) return;
+		if (this.left != null) {
+			this.left.getHlign();
+			this.hlignl = this.left.hlignl + this.left.hlignr;
+		}else {
+			this.hlignl = 1;
+		}
+		if (this.right != null) {
+			this.right.getHlign();
+			this.hlignr = this.right.hlignl + this.right.hlignr;
+		}else {
+			this.hlignr = 1;
 		}
 	}
 };

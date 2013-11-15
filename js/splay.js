@@ -1,9 +1,9 @@
-function Avl() {
+function Splay() {
 	var my = new Object();
 	my.count = 0;
 	my.root = null;
 	my.process = "";
-
+	
 	my.size = function() {
 		if (my.root == null) return 0;
 		return my.root.size;
@@ -13,8 +13,8 @@ function Avl() {
 		if (my.root == null) return -1;
 		return my.root.height;
 	}
-
-	my.insert = function (value) {
+	
+	my.insert = function(value) {
 		if (my.root == null) {
 			my.root = TreeNode(value, my.count ++);
 			my.process = "New root [" + value + "] created. ";
@@ -26,6 +26,8 @@ function Avl() {
 				if (value == u.value) {
 					my.process += "[" + value + "] = [" + u.value + "]. ";
 					my.process += "[" + value + "] already exists. ";
+					my.process += u.splay();
+					my.root = u;
 					return;
 				}
 				if (value < u.value) {
@@ -42,103 +44,12 @@ function Avl() {
 			node.father = v;
 			my.process += "[" + value + "] inserted. ";
 
-			u = v;
-			v = node;
-			while (u != null) {
-				u.update();
-				if (u.checkBalance()) {
-					v = u;
-					u = u.father;
-				}else {
-					my.process += u.reBalance();
-					u = v;
-				}
-			}
-			my.root = v;
+			my.process += node.splay();
+			my.root = node;
 		}
 	}
-
-	my.remove = function(value) {
-		my.process = "Deleting [" + value + "]. ";
-		if (my.root == null) {
-			my.process += "[" + value + "] not found. ";
-			return;
-		}
-		var u = my.root, v = null, w = null;
-		while (u != null) {
-			if (value == u.value) {
-				my.process += "[" + value + "] = [" + u.value + "]. ";
-				break;
-			}
-			if (value < u.value) {
-				my.process += "[" + value + "] < [" + u.value + "]. ";
-				u = u.left;
-			}else{
-				my.process += "[" + value + "] > [" + u.value + "]. "
-				u = u.right;
-			}
-		}
-		if (u == null) {
-			my.process += "[" + value + "] not found. ";
-			return;
-		}
-		
-		if (!u.isLeaf()) {//swaping
-			if (u.left == null) {
-				v = u.right;
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-			}else {
-				w = u.left;
-				v = w;
-				while (w != null) {
-					v = w;
-					w = w.right;
-				}
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-				if (v.left != null) {
-					w = v;
-					v = v.left;
-					w.value = v.value;
-					w.id = v.id;
-					my.process += "Swaping with [" + v.value + "]. ";
-				}
-			}
-		}else {
-			v = u;
-		}
-		
-		//delete leaf node v
-		if (v.father == null) {
-			my.root = null;
-			my.process += "[" + value + "] deleted. ";
-			return;
-		}
-		if (v.isLeft()) {
-			v.father.left = null;
-		}else {
-			v.father.right = null;
-		}
-		my.process += "[" + value + "] deleted. ";
-		
-		//backtrack
-		u = v.father;
-		while (u != null) {
-			u.update();
-			if (u.checkBalance()) {
-				v = u;
-				u = u.father;
-			}else {
-				my.process += u.reBalance();
-				u = v;
-			}
-		}
-		my.root = v;
-
-	}
+	
+	my.remove = function(value) {}
 	
 	my.find = function(value) {
 		my.process = "Finding [" + value + "]. ";
@@ -147,6 +58,8 @@ function Avl() {
 			if (value == u.value) {
 				my.process += "[" + value + "] = [" + u.value + "]. ";
 				my.process += "[" + value + "] found. ";
+				my.process += u.splay();
+				my.root = u;
 				return;
 			}
 			if (value < u.value) {
