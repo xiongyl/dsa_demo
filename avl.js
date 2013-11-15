@@ -275,6 +275,24 @@ function Avl() {
 		}
 		my.process += "[" + value + "] not found. ";
 	}
-
+	
+	my.deleteAll = function() {
+		my.process = "Deleting tree leaves in post-order. ";
+		post = function(node) {
+			ret = "";
+			if (node == null) return ret;
+			if (node.left != null) {
+				ret +=  post(node.left);
+			}
+			if (node.right != null) {
+				ret += post(node.right);
+			}
+			ret += "[" + node.value + "]. "
+			return ret;
+		}
+		my.process += post(my.root);
+		my.root = null;
+		my.process += "All nodes have been deleted. ";
+	}
 	return my;
 }

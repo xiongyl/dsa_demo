@@ -23,6 +23,7 @@
 <button id="insert">Insert</button>
 <button id="delete">Delete</button>
 <button id="find">Find</button>
+<button id="clear">Clear</button>
 </p>
 </div>
 <p></p>
@@ -43,6 +44,7 @@
 		$("#svgnum")[0].value = svgnum;
 		var input = $("#num").val();
 		$("#num")[0].value = "";
+		if (op == "Clear") input = "23";// specific for clear
 		if (input == null) return;
 		input = input.split(" ");
 		var opRecord = op + ": ";
@@ -53,6 +55,7 @@
 				if (op == "Insert") avltree.insert(num);
 				if (op == "Delete") avltree.remove(num);
 				if (op == "Find") avltree.find(num);
+				if (op == "Clear") avltree.deleteAll();
 				opRecord += num + " ";
 				empty = false;
 				break;//comment this to make it available to deal with many numbers once
@@ -66,7 +69,12 @@
 		}
 		drawroot[choose] = genDrawingTree(avltree.root);
 		if (drawroot[choose] != null) {
-			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+			//if(op == "Clear") {
+				//drawroot[choose].deleteAll(svg[choose]);
+				//avltree.root = null;
+			//}else {
+				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+			//}
 		}
 		$('#process' + choose).html(avltree.process);
 		choose = (choose + 1) % svgnum;
@@ -83,6 +91,10 @@
 	
 	$("#find").click(function() {
 		func("Find");
+	})
+	
+	$("#clear").click(function() {
+		func("Clear");
 	})
 
 	function genDrawingTree(node) {
