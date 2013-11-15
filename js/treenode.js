@@ -114,8 +114,8 @@ function TreeNode(value, id) {
 	
 	my.splay = function() {
 		var u = my;
-		var ret = "";
 		var value = u.value;
+		var ret = "Splaying [" + value + "]. ";
 		while (true) {
 			var v = u.father;
 			if (v == null) {

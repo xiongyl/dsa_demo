@@ -26,9 +26,7 @@ function Splay() {
 				if (value == u.value) {
 					my.process += "[" + value + "] = [" + u.value + "]. ";
 					my.process += "[" + value + "] already exists. ";
-					my.process += u.splay();
-					my.root = u;
-					return;
+					break;
 				}
 				if (value < u.value) {
 					my.process += "[" + value + "] < [" + u.value + "]. ";
@@ -38,29 +36,46 @@ function Splay() {
 					u = u.right;
 				}
 			}
+			my.process += v.splay();
+			my.root = v;
+			if (v.value == value) return;
 			var node = TreeNode(value, my.count ++);
-			if (v.value > value) v.left = node;
-			else v.right = node;
-			node.father = v;
-			my.process += "[" + value + "] inserted. ";
-
-			my.process += node.splay();
+			v.father = node;
+			if (v.value > value) {
+				node.right = v;
+				node.left = v.left;
+				if (v.left != null) {
+					v.left.father = node;
+				}
+				v.left = null;
+			}
+			else {
+				node.left = v;
+				node.right = v.right;
+				if (v.right != null) {
+					v.right.father = node;
+				}
+				v.right = null;
+			}
 			my.root = node;
+			my.process += "Split at [" + value + "]. ";
+			my.process += "[" + value + "] inserted. ";
 		}
 	}
 	
-	my.remove = function(value) {}
-	
-	my.find = function(value) {
-		my.process = "Finding [" + value + "]. ";
-		var u = my.root;
+	my.remove = function(value) {
+		my.process = "Deleting [" + value + "]. ";
+		if (my.root == null) {
+			my.process += "[" + value + "] not found. ";
+			return;
+		}
+		var u = my.root, v = null, w = null;
 		while (u != null) {
+			v = u;
 			if (value == u.value) {
 				my.process += "[" + value + "] = [" + u.value + "]. ";
 				my.process += "[" + value + "] found. ";
-				my.process += u.splay();
-				my.root = u;
-				return;
+				break;
 			}
 			if (value < u.value) {
 				my.process += "[" + value + "] < [" + u.value + "]. ";
@@ -70,7 +85,62 @@ function Splay() {
 				u = u.right;
 			}
 		}
-		my.process += "[" + value + "] not found. ";
+		if (u == null) {
+			my.process += "[" + value + "] not found. ";
+		}
+		my.process += v.splay();
+		my.root = v;
+		if (u == null) {
+			return;
+		}
+		if (u.right != null) {
+			v = u.right;
+			while (v != null) {
+				w = v;
+				v = v.left;
+			}
+			my.process += w.splay();
+			my.root = w;
+			w.left = u.left;
+			if (u.left != null) {
+				u.left.father = w;
+				my.process += "[" + w.value + "]-[" + u.left.value + "] joined. ";
+			}
+		}else {
+			my.root = u.left;
+			if (u.left != null) {
+				u.left.father = null;
+			}
+		}
+		my.process += "[" + value + "] deleted. ";
+	}
+	
+	my.find = function(value) {
+		my.process = "Finding [" + value + "]. ";
+		var u = my.root;
+		var v = null;
+		while (u != null) {
+			v = u;
+			if (value == u.value) {
+				my.process += "[" + value + "] = [" + u.value + "]. ";
+				my.process += "[" + value + "] found. ";
+				break;
+			}
+			if (value < u.value) {
+				my.process += "[" + value + "] < [" + u.value + "]. ";
+				u = u.left;
+			}else{
+				my.process += "[" + value + "] > [" + u.value + "]. "
+				u = u.right;
+			}
+		}
+		if (u == null) {
+			my.process += "[" + value + "] not found. ";
+		}
+		if (v != null) {
+			my.process += v.splay();
+			my.root = v;			
+		}
 	}
 	
 	my.deleteAll = function() {
