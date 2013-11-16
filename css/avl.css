@@ -35,16 +35,16 @@ label {
 }
 .divsvg {
 	width: 50%;
-	height: 45%;
+	height: 50%;
 	float:left; 
 }
 .process {
 	font: 16px/22px arial;
 	text-align: center;
 }
-#svgnum {
+#svgArg select {
 	font: 16px/22px arial;
-	width: 50px;
+	width: 60px;
 	height: 32px;
 }
 #num {

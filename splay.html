@@ -7,15 +7,28 @@
 </head>
 
 <body>
+<div id="links" align="center">
+	<a href="avl.html">AVL</a>
+	<a href="splay.html">Splay</a>
+</div>
 <h1 align="center">Splay Tree Demo</h1>
 <div id="input" align="center">
-	<select id="svgnum">
-		<option>1</option>
-		<option selected>2</option>
-		<option>3</option>
-		<option>4</option>
-	</select>
-	<label> step(s) in screen</label>
+	<p id="svgArg">
+		Screen:
+		Height:
+		<select id="svgHeight">
+			<option selected>50%</option>
+			<option>75%</option>
+			<option>100%</option>
+		</select>
+		Step Number:
+		<select id="svgNum">
+			<option>1</option>
+			<option selected>2</option>
+			<option>3</option>
+			<option>4</option>
+		</select>
+	</p>
 	<p>
 		<button id="history">History</button>
 		<input id="num" type="text" maxlength="100" autocomplete="off"></input>
@@ -26,7 +39,6 @@
 		<button id="clear">Clear</button>
 	</p>
 </div>
-<p></p>
 
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/d3.v3.min.js"></script>
@@ -36,13 +48,13 @@
 <script type="text/javascript">
 	var drawy = 50;
 	var initRandomSize = 10;
-	var randomSize = Math.ceil(initRandomSize / $("#svgnum")[0].value);
-	var splaytree, choose, drawroot, history, svg, svgnum;
+	var randomSize = Math.ceil(initRandomSize / $("#svgNum")[0].value);
+	var splaytree, choose, drawroot, history, svg, svgNum;
 	var divsvg = [];
 	start();
 	
 	function func(op) {
-		$("#svgnum")[0].value = svgnum;
+		$("#svgNum")[0].value = svgNum;
 		var input = $("#num").val();
 		$("#num")[0].value = "";
 		if (op == "Clear") input = "23";// specific for clear
@@ -70,10 +82,10 @@
 		}
 		drawroot[choose] = genDrawingTree(splaytree.root);
 		if (drawroot[choose] != null) {
-			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
 		}
 		$('#process' + choose).html(splaytree.process);
-		choose = (choose + 1) % svgnum;
+		choose = (choose + 1) % svgNum;
 		history += opRecord + "\n";
 	}
 	
@@ -115,24 +127,24 @@
 		}
 		drawroot[choose] = genDrawingTree(splaytree.root);
 		if (drawroot[choose] != null) {
-			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgnum * 0.5, drawy);
+			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
 		}
 		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
-		choose = (choose + 1) % svgnum;
+		choose = (choose + 1) % svgNum;
 		history += output + "\n";
 	};
 	
 	function start() {
-		svgnum = $('#svgnum').val();
+		svgNum = $('#svgNum').val();
 		for (var i = 0; i < divsvg.length; ++i) {
 			divsvg[i].remove();
 		}
-		for (var i = 0; i < svgnum; ++i) {
+		for (var i = 0; i < svgNum; ++i) {
 			$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');
 		}
 		divsvg = $('.divsvg');
 		var styleWidth = "50%"
-		switch(svgnum) {
+		switch(svgNum) {
 			case "1": styleWidth = "100%"; break;
 			case "3": styleWidth = "33%"; break;
 			case "4": styleWidth = "25%"; break;
@@ -148,15 +160,22 @@
 			svg.push(d3.select('#divsvg'+i).append('svg'));
 			$('#divsvg'+i).append('<p class="process" id="process' + i + '"></p>');
 		}
-		randomSize = Math.ceil(initRandomSize / svgnum);
+		randomSize = Math.ceil(initRandomSize / svgNum);
 		randomData();
+		updateSvgHeight();
 	}
 	
-	$("#svgnum").change(start);
+	$("#svgNum").change(start);
 	
 	$("#history").click(function() {
 		alert(history);
 	});
+	
+	function updateSvgHeight() {
+		value = $("#svgHeight").val();
+		$(".divsvg").css("height", value);
+	}
+	$("#svgHeight").change(updateSvgHeight);
 </script>
 </body>
 </html>
