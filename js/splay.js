@@ -63,8 +63,18 @@ function Splay() {
 		}
 	}
 	
-	my.remove = function(value) {
-		my.process = "Deleting [" + value + "]. ";
+	my.remove = function(value, swap) {
+		if (swap == "rand") {
+			if (Math.random() > 0.5) {
+				swap = "succ";
+			}else {
+				swap = "pred";
+			}
+		}
+		if (swap != "succ" && swap != "pred") {
+			swap = "pred";
+		}
+		my.process = "Removing [" + value + "]. ";
 		if (my.root == null) {
 			my.process += "[" + value + "] not found. ";
 			return;
@@ -93,26 +103,48 @@ function Splay() {
 		if (u == null) {
 			return;
 		}
-		if (u.right != null) {
-			v = u.right;
-			while (v != null) {
-				w = v;
-				v = v.left;
-			}
-			my.process += w.splay();
-			my.root = w;
-			w.left = u.left;
-			if (u.left != null) {
-				u.left.father = w;
-				my.process += "[" + w.value + "]-[" + u.left.value + "] joined. ";
+		if (swap == "succ") {
+			if (u.right != null) {
+				v = u.right;
+				while (v != null) {
+					w = v;
+					v = v.left;
+				}
+				my.process += w.splay();
+				my.root = w;
+				w.left = u.left;
+				if (u.left != null) {
+					u.left.father = w;
+					my.process += "[" + w.value + "]-[" + u.left.value + "] joined. ";
+				}
+			}else {
+				my.root = u.left;
+				if (u.left != null) {
+					u.left.father = null;
+				}
 			}
 		}else {
-			my.root = u.left;
 			if (u.left != null) {
-				u.left.father = null;
+				v = u.left;
+				while (v != null) {
+					w = v;
+					v = v.right;
+				}
+				my.process += w.splay();
+				my.root = w;
+				w.right = u.right;
+				if (u.right != null) {
+					u.right.father = w;
+					my.process += "[" + w.value + "]-[" + u.right.value + "] joined. ";
+				}
+			}else {
+				my.root = u.right;
+				if (u.right != null) {
+					u.right.father = null;
+				}
 			}
 		}
-		my.process += "[" + value + "] deleted. ";
+		my.process += "[" + value + "] removed. ";
 	}
 	
 	my.search = function(value) {
@@ -144,7 +176,7 @@ function Splay() {
 	}
 	
 	my.removeAll = function() {
-		my.process = "Deleting tree leaves in post-order. ";
+		my.process = "Removing tree leaves in post-order. ";
 		post = function(node) {
 			ret = "";
 			if (node == null) return ret;
@@ -159,7 +191,7 @@ function Splay() {
 		}
 		my.process += post(my.root);
 		my.root = null;
-		my.process += "All nodes have been deleted. ";
+		my.process += "All nodes have been removed. ";
 	}
 	return my;
 }

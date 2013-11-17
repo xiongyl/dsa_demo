@@ -34,8 +34,13 @@
 		<input id="num" type="text" maxlength="100" autocomplete="off"></input>
 		<button id="insert">Insert</button>
 		<button id="remove">Remove</button>
-		<button id="search">Search</button>
+		<select id="removeSwap">
+			<option selected>pred</option>
+			<option>succ</option>
+			<option>rand</option>
+		</select>
 		<button id="removeAll">RemoveAll</button>
+		<button id="search">Search</button>
 	</p>
 </div>
 
@@ -75,7 +80,7 @@
 			for (var i = 0; i < nums.length; ++i) {
 				var num = nums[i];
 				if (op == "Insert") avltree.insert(num);
-				if (op == "Remove") avltree.remove(num);
+				if (op == "Remove") avltree.remove(num, $('#removeSwap').val());
 				if (op == "Search") avltree.search(num);
 				opRecord += num + " ";
 				//break; //comment this to make it available to deal with many numbers once

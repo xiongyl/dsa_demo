@@ -58,8 +58,18 @@ function Avl() {
 		}
 	}
 
-	my.remove = function(value) {
-		my.process = "Deleting [" + value + "]. ";
+	my.remove = function(value, swap) {
+		if (swap == "rand") {
+			if (Math.random() > 0.5) {
+				swap = "succ";
+			}else {
+				swap = "pred";
+			}
+		}
+		if (swap != "succ" && swap != "pred") {
+			swap = "pred";
+		}
+		my.process = "Removing [" + value + "]. ";
 		if (my.root == null) {
 			my.process += "[" + value + "] not found. ";
 			return;
@@ -84,27 +94,53 @@ function Avl() {
 		}
 		
 		if (!u.isLeaf()) {//swaping
-			if (u.left == null) {
-				v = u.right;
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-			}else {
-				w = u.left;
-				v = w;
-				while (w != null) {
-					v = w;
-					w = w.right;
-				}
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-				if (v.left != null) {
-					w = v;
-					v = v.left;
-					w.value = v.value;
-					w.id = v.id;
+			if (swap == "pred") {
+				if (u.left == null) {
+					v = u.right;
+					u.value = v.value;
+					u.id = v.id;
 					my.process += "Swaping with [" + v.value + "]. ";
+				}else {
+					w = u.left;
+					v = w;
+					while (w != null) {
+						v = w;
+						w = w.right;
+					}
+					u.value = v.value;
+					u.id = v.id;
+					my.process += "Swaping with [" + v.value + "]. ";
+					if (v.left != null) {
+						w = v;
+						v = v.left;
+						w.value = v.value;
+						w.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+					}
+				}
+			}else {
+				if (u.right == null) {
+					v = u.left;
+					u.value = v.value;
+					u.id = v.id;
+					my.process += "Swaping with [" + v.value + "]. ";
+				}else {
+					w = u.right;
+					v = w;
+					while (w != null) {
+						v = w;
+						w = w.left;
+					}
+					u.value = v.value;
+					u.id = v.id;
+					my.process += "Swaping with [" + v.value + "]. ";
+					if (v.right != null) {
+						w = v;
+						v = v.right;
+						w.value = v.value;
+						w.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+					}
 				}
 			}
 		}else {
@@ -114,7 +150,7 @@ function Avl() {
 		//delete leaf node v
 		if (v.father == null) {
 			my.root = null;
-			my.process += "[" + value + "] deleted. ";
+			my.process += "[" + value + "] removed. ";
 			return;
 		}
 		if (v.isLeft()) {
@@ -122,7 +158,7 @@ function Avl() {
 		}else {
 			v.father.right = null;
 		}
-		my.process += "[" + value + "] deleted. ";
+		my.process += "[" + value + "] removed. ";
 		
 		//backtrack
 		u = v.father;
@@ -161,7 +197,7 @@ function Avl() {
 	}
 	
 	my.removeAll = function() {
-		my.process = "Deleting tree leaves in post-order. ";
+		my.process = "Removing tree nodes in post-order. ";
 		post = function(node) {
 			ret = "";
 			if (node == null) return ret;
@@ -176,7 +212,7 @@ function Avl() {
 		}
 		my.process += post(my.root);
 		my.root = null;
-		my.process += "All nodes have been deleted. ";
+		my.process += "All nodes have been removed. ";
 	}
 	return my;
 }
