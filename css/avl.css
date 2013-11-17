@@ -19,13 +19,13 @@ span{
 	border-color: #9a9a9a #cdcdcd #cdcdcd #9a9a9a;
 	vertical-align: top;
 }
-input {
-	-webkit-appearance: none;
-}
 button {
 	width: 75px;
 	height: 32px;
 	font: 16px/22px arial;
+}
+#removeAll {
+	font: 12px/22px arial;
 }
 p {
 	font: 20px/22px arial;
@@ -48,6 +48,7 @@ label {
 	height: 32px;
 }
 #num {
+	-webkit-appearance: none;
 	width: 405px;
 	height: 32px;
 	font: 16px/22px arial;

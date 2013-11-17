@@ -32,50 +32,54 @@
 	<p>
 		<button id="history">History</button>
 		<input id="num" type="text" maxlength="100" autocomplete="off"></input>
-		<button id="random" onclick="$('#num')[0].value = Math.ceil(Math.random() * 100)">Random</button>
 		<button id="insert">Insert</button>
-		<button id="delete">Delete</button>
-		<button id="find">Find</button>
-		<button id="clear">Clear</button>
+		<button id="remove">Remove</button>
+		<button id="search">Search</button>
+		<button id="removeAll">RemoveAll</button>
 	</p>
 </div>
 
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/d3.v3.min.js"></script>
+<script type="text/javascript" src="js/draw.js"></script>
 <script type="text/javascript" src="js/treenode.js"></script>
 <script type="text/javascript" src="js/splay.js"></script>
-<script type="text/javascript" src="js/draw.js"></script>
 <script type="text/javascript">
 	var drawy = 50;
 	var initRandomSize = 10;
 	var randomSize = Math.ceil(initRandomSize / $("#svgNum")[0].value);
 	var splaytree, choose, drawroot, history, svg, svgNum;
-	var divsvg = [];
 	start();
 	
 	function func(op) {
-		$("#svgNum")[0].value = svgNum;
+		$("#svgNum option[value=" + svgNum + "]").attr("selected", "true");
 		var input = $("#num").val();
-		$("#num")[0].value = "";
-		if (op == "Clear") input = "23";// specific for clear
-		if (input == null) return;
-		input = input.split(" ");
-		var opRecord = op + ": ";
-		var empty = true;
-		for (var i = 0; i < input.length; ++i) {
-			var num = parseInt(input[i]);
-			if (!isNaN(num)) {
-				if (op == "Insert") splaytree.insert(num);
-				if (op == "Delete") splaytree.remove(num);
-				if (op == "Find") splaytree.find(num);
-				if (op == "Clear") splaytree.deleteAll();
-				opRecord += num + " ";
-				empty = false;
-				break;//comment this to make it available to deal with many numbers once
+		$("#num").attr("value", "");
+		var opRecord = op + " ";
+		if (op == "RemoveAll") {
+			splaytree.removeAll();
+		}else {
+			if (input == null) return;
+			input = input.split(" ");
+			var nums = [];
+			for (var i = 0; i < input.length; ++i) {
+				var num = parseInt(input[i]);
+				if (!isNaN(num)) {
+					nums.push(num);
+				}
 			}
-		}
-		if (empty) {
-			return;
+			if (nums.length == 0) {
+				//return; //uncomment this to make it unavailable to add random number
+				nums.push(Math.ceil(Math.random() * 100));
+			}
+			for (var i = 0; i < nums.length; ++i) {
+				var num = nums[i];
+				if (op == "Insert") splaytree.insert(num);
+				if (op == "Remove") splaytree.remove(num);
+				if (op == "Search") splaytree.search(num);
+				opRecord += num + " ";
+				//break; //comment this to make it available to deal with many numbers once
+			}
 		}
 		if (drawroot[choose] != null) {
 			drawroot[choose].remove();
@@ -93,16 +97,16 @@
 		func("Insert");
 	})
 
-	$("#delete").click(function() {
-		func("Delete");
+	$("#remove").click(function() {
+		func("Remove");
 	})
 	
-	$("#find").click(function() {
-		func("Find");
+	$("#search").click(function() {
+		func("Search");
 	})
 	
-	$("#clear").click(function() {
-		func("Clear");
+	$("#removeAll").click(function() {
+		func("RemoveAll");
 	})
 
 	function genDrawingTree(node) {
@@ -116,7 +120,7 @@
 	}
 
 	function randomData() {
-		var output = "Insert: ";
+		var output = "Insert ";
 		for (var i = 0; i < randomSize; ++i) {
 			var num = Math.ceil(Math.random() * 100);
 			splaytree.insert(num);
@@ -129,6 +133,7 @@
 		if (drawroot[choose] != null) {
 			drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
 		}
+		var divsvg = $('.divsvg');
 		divsvg[choose].getElementsByTagName('p')[0].textContent = output;
 		choose = (choose + 1) % svgNum;
 		history += output + "\n";
@@ -136,8 +141,9 @@
 	
 	function start() {
 		svgNum = $('#svgNum').val();
-		for (var i = 0; i < divsvg.length; ++i) {
-			divsvg[i].remove();
+		var divsvg = $('.divsvg');
+		if (divsvg) {
+			divsvg.remove();
 		}
 		for (var i = 0; i < svgNum; ++i) {
 			$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');

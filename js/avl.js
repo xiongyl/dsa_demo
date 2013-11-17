@@ -140,8 +140,8 @@ function Avl() {
 
 	}
 	
-	my.find = function(value) {
-		my.process = "Finding [" + value + "]. ";
+	my.search = function(value) {
+		my.process = "Searching [" + value + "]. ";
 		var u = my.root;
 		while (u != null) {
 			if (value == u.value) {
@@ -160,7 +160,7 @@ function Avl() {
 		my.process += "[" + value + "] not found. ";
 	}
 	
-	my.deleteAll = function() {
+	my.removeAll = function() {
 		my.process = "Deleting tree leaves in post-order. ";
 		post = function(node) {
 			ret = "";

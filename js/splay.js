@@ -115,8 +115,8 @@ function Splay() {
 		my.process += "[" + value + "] deleted. ";
 	}
 	
-	my.find = function(value) {
-		my.process = "Finding [" + value + "]. ";
+	my.search = function(value) {
+		my.process = "Searching [" + value + "]. ";
 		var u = my.root;
 		var v = null;
 		while (u != null) {
@@ -143,7 +143,7 @@ function Splay() {
 		}
 	}
 	
-	my.deleteAll = function() {
+	my.removeAll = function() {
 		my.process = "Deleting tree leaves in post-order. ";
 		post = function(node) {
 			ret = "";
