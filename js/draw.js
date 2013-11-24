@@ -92,6 +92,7 @@ Node.prototype = {
 				.style("text-weight", "bold")
 				.style("font-family", "Consolas")
 				.style("text-anchor", "middle")
+				.style("fill", "#fff")
 				.text(this.value);
 		}
 	},
