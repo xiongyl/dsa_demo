@@ -112,7 +112,9 @@
 			}
 			drawroot[choose] = genDrawingTree(splaytree.root);
 			if (drawroot[choose] != null) {
-				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
+				drawroot[choose].getHlign();
+				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
+				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
 			}
 			$('#process' + choose).html(splaytree.process);
 			choose = (choose + 1) % svgNum;
@@ -163,7 +165,9 @@
 			}
 			drawroot[choose] = genDrawingTree(splaytree.root);
 			if (drawroot[choose] != null) {
-				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
+				drawroot[choose].getHlign();
+				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
+				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
 			}
 			var divsvg = $('.divsvg');
 			divsvg[choose].getElementsByTagName('p')[0].textContent = output;
@@ -228,7 +232,9 @@
 				}
 				drawroot[choose] = genDrawingTree(splaytree.root);
 				if (drawroot[choose] != null) {
-					drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
+					drawroot[choose].getHlign();
+					var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
+					drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
 				}
 				var divsvg = $('.divsvg');
 				divsvg[choose].getElementsByTagName('p')[0].textContent = output;

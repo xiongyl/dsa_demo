@@ -51,38 +51,36 @@ Node.prototype = {
 			this.element = svg.append("g");
 			var lineStroke = "#1b1d1e";
 			var lineStrokeWidth = "5px";
-			if (this.father == null) {
-				this.element.append("line")
+			var vlignOffset = 2.5;
+			this.element.append("line")
 					.attr("x1", 0).attr("y1", 0)
 					.attr("x2", 0)
+					.attr("y2", - (vlign + vlignOffset))
+					.attr("stroke", lineStroke)
+					.attr("stroke-width", lineStrokeWidth);
+			if (this.isLeft()) {
+				var interval = this.hlignr * baseInterval;
+				this.element.append("line")
+					.attr("x1", 0).attr("y1", -vlign)
+					.attr("x2", -interval * (0 - 0.5))
 					.attr("y2", -vlign)
 					.attr("stroke", lineStroke)
 					.attr("stroke-width", lineStrokeWidth);
-			}else {
-				if (this.isLeft()) {
-					var interval = this.hlignr * baseInterval;
-					this.element.append("line")
-						.attr("x1", 0).attr("y1", 0)
-						.attr("x2", -interval * (0 - 0.5))
-						.attr("y2", -vlign)
-						.attr("stroke", lineStroke)
-						.attr("stroke-width", lineStrokeWidth);
-				}else{
-					var interval = this.hlignl * baseInterval;
-					this.element.append("line")
-						.attr("x1", 0).attr("y1", 0)
-						.attr("x2", -interval * (1 - 0.5))
-						.attr("y2", -vlign)
-						.attr("stroke", lineStroke)
-						.attr("stroke-width", lineStrokeWidth);
-				}
+			}else if(this.isRight()) {
+				var interval = this.hlignl * baseInterval;
+				this.element.append("line")
+					.attr("x1", 0).attr("y1", -vlign)
+					.attr("x2", -interval * (1 - 0.5))
+					.attr("y2", -vlign)
+					.attr("stroke", lineStroke)
+					.attr("stroke-width", lineStrokeWidth);
 			}
 			this.element
 				.attr("transform", "translate(" + x + "," + y + ")")
 				.transition()
 				.duration(1000)
 				.delay(0)
-				.attr("transform", "translate(" + x + "," + (y + 50) + ")");
+				.attr("transform", "translate(" + x + "," + (y + 30) + ")");
 			this.element.append("circle")
 						.attr("r", 18)
 						.style("stroke", "#ccc")
