@@ -1,6 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>   
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+	<META http-equiv="X-UA-Compatible" content="IE=9" > </META>
 	<title>AVL Tree Demo</title>   
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /> 
 	<link rel="stylesheet" href="css/avl.css"/>
@@ -30,8 +32,9 @@
 			</select>
 		</p>
 		<p>
+			<input id="bbst" type="checkbox" checked>BBST
 			<button id="history">History</button>
-			<input id="num" type="text" maxlength="100" autocomplete="off"></input>
+			<input id="num" type="text" maxlength="100" autocomplete="off">
 			<button id="insert">Insert</button>
 			<button id="remove">Remove</button>
 			<select id="removeSwap">
@@ -53,16 +56,25 @@
 		var drawy = 50;
 		var initRandomSize = 10;
 		var randomSize = Math.ceil(initRandomSize / $("#svgNum")[0].value);
-		var avltree, choose, drawroot, history, svg, svgNum;
+		var avltree, avltreeCache, choose, drawroot, history, svg, svgNum;
 		start();
 		
 		function func(op) {
 			$("#svgNum option[value=" + svgNum + "]").attr("selected", "true");
 			var input = $("#num").val();
 			$("#num").attr("value", "");
-			var opRecord = op + " ";
+			var opRecord;
+			if ($("#bbst").attr("checked") != null) {
+				opRecord = "bbst " + op + " ";
+			}else {
+				opRecord = op + " ";
+			}
+			if (op == "Remove") {
+				opRecord += "(" + $('#removeSwap').val() + ") ";
+			}
 			if (op == "RemoveAll") {
 				avltree.removeAll();
+				avltreeCache.removeAll();
 			}else {
 				if (input == null) return;
 				input = input.split(" ");
@@ -79,9 +91,18 @@
 				}
 				for (var i = 0; i < nums.length; ++i) {
 					var num = nums[i];
-					if (op == "Insert") avltree.insert(num);
-					if (op == "Remove") avltree.remove(num, $('#removeSwap').val());
-					if (op == "Search") avltree.search(num);
+					if (op == "Insert") {
+						avltree.insert(num, $('#bbst').attr("checked") != null);
+						avltreeCache.insert(num, true);
+					}
+					if (op == "Remove") {
+						avltree.remove(num, $('#removeSwap').val(), $('#bbst').attr("checked") != null);
+						avltreeCache.remove(num, $('removeSwap').val(), true);
+					}
+					if (op == "Search") {
+						avltree.search(num, $('#bbst').attr("checked") != null);
+						avltreeCache.search(num, true);
+					}
 					opRecord += num + " ";
 					//break; //comment this to make it available to deal with many numbers once
 				}
@@ -125,10 +146,16 @@
 		}
 
 		function randomData() {
-			var output = "Insert ";
+			var output;
+			if ($("#bbst").attr("checked") != null) {
+				output = "bbst Insert ";
+			}else {
+				output = "Insert ";
+			}
 			for (var i = 0; i < randomSize; ++i) {
 				var num = Math.ceil(Math.random() * 100);
-				avltree.insert(num);
+				avltree.insert(num, $('#bbst').attr("checked") != null);
+				avltreeCache.insert(num, true);
 				output += num + " ";
 			}
 			if (drawroot[choose] != null) {
@@ -136,7 +163,7 @@
 			}
 			drawroot[choose] = genDrawingTree(avltree.root);
 			if (drawroot[choose] != null) {
-				drawrootchoose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
+				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
 			}
 			var divsvg = $('.divsvg');
 			divsvg[choose].getElementsByTagName('p')[0].textContent = output;
@@ -154,20 +181,21 @@
 				$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');
 			}
 			divsvg = $('.divsvg');
-			var styleWidth = "50%"
+			var cssWidth = "50%"
 			switch(svgNum) {
-				case "1": styleWidth = "100%"; break;
-				case "3": styleWidth = "33%"; break;
-				case "4": styleWidth = "25%"; break;
-				case "5": styleWidth = "20%"; break;
+				case "1": cssWidth = "100%"; break;
+				case "3": cssWidth = "33%"; break;
+				case "4": cssWidth = "25%"; break;
+				case "5": cssWidth = "20%"; break;
 			}
+			divsvg.css('width', cssWidth);
 			avltree = Avl();
+			avltreeCache = Avl();
 			choose = 0;
 			drawroot = [];
 			svg = [];
 			history = "";
 			for (var i = 0; i < divsvg.length; ++i) {
-				divsvg[i].style.width = styleWidth;
 				svg.push(d3.select('#divsvg'+i).append('svg'));
 				$('#divsvg'+i).append('<p class="process" id="process' + i + '"></p>');
 			}
@@ -187,6 +215,27 @@
 			$(".divsvg").css("height", value);
 		}
 		$("#svgHeight").change(updateSvgHeight);
+		
+		$("#bbst").change(function() {
+			if ($("#bbst").attr("checked") != null) {
+				avltree = avltreeCache.clone();
+				if (avltree.count < 2) {
+					return;
+				}
+				var output = "BBST choosed";
+				if (drawroot[choose] != null) {
+					drawroot[choose].remove();
+				}
+				drawroot[choose] = genDrawingTree(avltree.root);
+				if (drawroot[choose] != null) {
+					drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * 0.5, drawy);
+				}
+				var divsvg = $('.divsvg');
+				divsvg[choose].getElementsByTagName('p')[0].textContent = output;
+				choose = (choose + 1) % svgNum;
+				history += output + "\n";
+			}
+		})
 	</script>
 </body>
 </html>

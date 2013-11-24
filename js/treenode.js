@@ -162,5 +162,32 @@ function TreeNode(value, id) {
 			}
 		}
 	}
+	
+	my.post = function() {
+		var ret = "";
+		if (my.left != null) {
+			ret += my.left.post();
+		}
+		if (my.right != null) {
+			ret += my.right.post();
+		}
+		ret += "[" + my.value + "]. "
+		return ret;
+	}
+	
+	my.clone = function() {
+		var node = TreeNode(my.value, my.count);
+		node.height = my.height;
+		node.size = my.size;
+		if (my.left != null) {
+			node.left = my.left.clone();
+			node.left.father = node;
+		}
+		if (my.right != null) {
+			node.right = my.right.clone();
+			node.right.father = node;
+		}
+		return node;
+	}
 	return my;
 }

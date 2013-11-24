@@ -14,7 +14,7 @@ function Avl() {
 		return my.root.height;
 	}
 
-	my.insert = function (value) {
+	my.insert = function (value, bbst) {
 		if (my.root == null) {
 			my.root = TreeNode(value, my.count ++);
 			my.process = "New root [" + value + "] created. ";
@@ -42,6 +42,9 @@ function Avl() {
 			node.father = v;
 			my.process += "[" + value + "] inserted. ";
 
+			if (bbst == false) {
+				return;
+			}
 			u = v;
 			v = node;
 			while (u != null) {
@@ -58,7 +61,7 @@ function Avl() {
 		}
 	}
 
-	my.remove = function(value, swap) {
+	my.remove = function(value, swap, bbst) {
 		if (swap == "rand") {
 			if (Math.random() > 0.5) {
 				swap = "succ";
@@ -160,6 +163,9 @@ function Avl() {
 		}
 		my.process += "[" + value + "] removed. ";
 		
+		if (bbst == false) {
+			return;
+		}
 		//backtrack
 		u = v.father;
 		while (u != null) {
@@ -176,7 +182,7 @@ function Avl() {
 
 	}
 	
-	my.search = function(value) {
+	my.search = function(value, bbst) {
 		my.process = "Searching [" + value + "]. ";
 		var u = my.root;
 		while (u != null) {
@@ -198,21 +204,21 @@ function Avl() {
 	
 	my.removeAll = function() {
 		my.process = "Removing tree nodes in post-order. ";
-		post = function(node) {
-			ret = "";
-			if (node == null) return ret;
-			if (node.left != null) {
-				ret +=  post(node.left);
-			}
-			if (node.right != null) {
-				ret += post(node.right);
-			}
-			ret += "[" + node.value + "]. "
-			return ret;
+		if (my.root != null) {
+			my.process += my.root.post();
+			my.root = null;
 		}
-		my.process += post(my.root);
-		my.root = null;
 		my.process += "All nodes have been removed. ";
+	}
+	
+	my.clone = function() {
+		var newtree = Avl();
+		newtree.count = my.count;
+		newtree.process = my.process;
+		if (my.root != null) {
+			newtree.root = my.root.clone();
+		}
+		return newtree;
 	}
 	return my;
 }

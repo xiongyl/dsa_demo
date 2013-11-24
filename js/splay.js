@@ -14,7 +14,7 @@ function Splay() {
 		return my.root.height;
 	}
 	
-	my.insert = function(value) {
+	my.insert = function(value, bbst) {
 		if (my.root == null) {
 			my.root = TreeNode(value, my.count ++);
 			my.process = "New root [" + value + "] created. ";
@@ -35,6 +35,17 @@ function Splay() {
 					my.process += "[" + value + "] > [" + u.value + "]. "
 					u = u.right;
 				}
+			}
+			if (bbst == false) {
+				if (u != null) {
+					return;
+				}
+				var node = TreeNode(value, my.count ++);
+				if (v.value > value) v.left = node;
+				else v.right = node;
+				node.father = v;
+				my.process += "[" + value + "] inserted. ";
+				return;
 			}
 			my.process += v.splay();
 			my.root = v;
@@ -63,7 +74,7 @@ function Splay() {
 		}
 	}
 	
-	my.remove = function(value, swap) {
+	my.remove = function(value, swap, bbst) {
 		if (swap == "rand") {
 			if (Math.random() > 0.5) {
 				swap = "succ";
@@ -98,6 +109,76 @@ function Splay() {
 		if (u == null) {
 			my.process += "[" + value + "] not found. ";
 		}
+		if (bbst == false) {
+			if (u == null) return;
+			if (!u.isLeaf()) {//swaping
+				if (swap == "pred") {
+					if (u.left == null) {
+						v = u.right;
+						u.value = v.value;
+						u.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+					}else {
+						w = u.left;
+						v = w;
+						while (w != null) {
+							v = w;
+							w = w.right;
+						}
+						u.value = v.value;
+						u.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+						if (v.left != null) {
+							w = v;
+							v = v.left;
+							w.value = v.value;
+							w.id = v.id;
+							my.process += "Swaping with [" + v.value + "]. ";
+						}
+					}
+				}else {
+					if (u.right == null) {
+						v = u.left;
+						u.value = v.value;
+						u.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+					}else {
+						w = u.right;
+						v = w;
+						while (w != null) {
+							v = w;
+							w = w.left;
+						}
+						u.value = v.value;
+						u.id = v.id;
+						my.process += "Swaping with [" + v.value + "]. ";
+						if (v.right != null) {
+							w = v;
+							v = v.right;
+							w.value = v.value;
+							w.id = v.id;
+							my.process += "Swaping with [" + v.value + "]. ";
+						}
+					}
+				}
+			}else {
+				v = u;
+			}
+			//delete leaf node v
+			if (v.father == null) {
+				my.root = null;
+				my.process += "[" + value + "] removed. ";
+				return;
+			}
+			if (v.isLeft()) {
+				v.father.left = null;
+			}else {
+				v.father.right = null;
+			}
+			my.process += "[" + value + "] removed. ";
+			
+			return;
+		}//bst
 		my.process += v.splay();
 		my.root = v;
 		if (u == null) {
@@ -147,7 +228,7 @@ function Splay() {
 		my.process += "[" + value + "] removed. ";
 	}
 	
-	my.search = function(value) {
+	my.search = function(value, bbst) {
 		my.process = "Searching [" + value + "]. ";
 		var u = my.root;
 		var v = null;
@@ -169,7 +250,7 @@ function Splay() {
 		if (u == null) {
 			my.process += "[" + value + "] not found. ";
 		}
-		if (v != null) {
+		if (v != null && bbst == true) {
 			my.process += v.splay();
 			my.root = v;			
 		}
@@ -177,21 +258,21 @@ function Splay() {
 	
 	my.removeAll = function() {
 		my.process = "Removing tree leaves in post-order. ";
-		post = function(node) {
-			ret = "";
-			if (node == null) return ret;
-			if (node.left != null) {
-				ret +=  post(node.left);
-			}
-			if (node.right != null) {
-				ret += post(node.right);
-			}
-			ret += "[" + node.value + "]. "
-			return ret;
+		if (my.root != null) {
+			my.process += my.root.post();
+			my.root = null;
 		}
-		my.process += post(my.root);
-		my.root = null;
 		my.process += "All nodes have been removed. ";
+	}
+	
+	my.clone = function() {
+		var newtree = Splay();
+		newtree.count = my.count;
+		newtree.process = my.process;
+		if (my.root != null) {
+			newtree.root = my.root.clone();
+		}
+		return newtree;
 	}
 	return my;
 }
