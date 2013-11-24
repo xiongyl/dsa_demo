@@ -39,7 +39,7 @@ label {
 	float:left; 
 }
 .process {
-	font: 16px/22px arial;
+	font: 20px/22px Consolas;
 	text-align: center;
 }
 select {

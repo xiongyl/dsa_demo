@@ -49,13 +49,15 @@ Node.prototype = {
 				this.right.draw(svg, x + rightInterval * (1 - 0.5), y + vlign);
 			}
 			this.element = svg.append("g");
+			var lineStroke = "#1b1d1e";
+			var lineStrokeWidth = "5px";
 			if (this.father == null) {
 				this.element.append("line")
 					.attr("x1", 0).attr("y1", 0)
 					.attr("x2", 0)
 					.attr("y2", -vlign)
-					.attr("stroke-width", 2)
-					.attr("stroke", "black");
+					.attr("stroke", lineStroke)
+					.attr("stroke-width", lineStrokeWidth);
 			}else {
 				if (this.isLeft()) {
 					var interval = this.hlignr * baseInterval;
@@ -63,16 +65,16 @@ Node.prototype = {
 						.attr("x1", 0).attr("y1", 0)
 						.attr("x2", -interval * (0 - 0.5))
 						.attr("y2", -vlign)
-						.attr("stroke-width", 2)
-						.attr("stroke", "black");
+						.attr("stroke", lineStroke)
+						.attr("stroke-width", lineStrokeWidth);
 				}else{
 					var interval = this.hlignl * baseInterval;
 					this.element.append("line")
 						.attr("x1", 0).attr("y1", 0)
 						.attr("x2", -interval * (1 - 0.5))
 						.attr("y2", -vlign)
-						.attr("stroke-width", 2)
-						.attr("stroke", "black");
+						.attr("stroke", lineStroke)
+						.attr("stroke-width", lineStrokeWidth);
 				}
 			}
 			this.element
@@ -83,10 +85,16 @@ Node.prototype = {
 				.attr("transform", "translate(" + x + "," + (y + 50) + ")");
 			this.element.append("circle")
 						.attr("r", 18)
-						.style("fill", "#CCC")
+						.style("stroke", "#ccc")
+						.style("stroke-width", "3px")
+						.style("fill", "#1b1d1e");
 			txt = this.element.append("text")
+				.attr("dy", "0.25em")
+				.style("stroke", "#fff")
+				.style("text-weight", "bold")
+				.style("font-family", "Consolas")
+				.style("text-anchor", "middle")
 				.text(this.value);
-			txt.style("fill", "black");
 		}
 	},
 	remove: function() {
