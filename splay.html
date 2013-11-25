@@ -17,6 +17,11 @@
 	<div id="input" align="center">
 		<p id="svgArg">
 			Screen:
+			Width:
+			<select id="svgWidth">
+				<option selected>50%</option>
+				<option>100%</option>
+			</select>
 			Height:
 			<select id="svgHeight">
 				<option selected>50%</option>
@@ -53,7 +58,7 @@
 	<script type="text/javascript" src="js/treenode.js"></script>
 	<script type="text/javascript" src="js/splay.js"></script>
 	<script type="text/javascript">
-		var drawy = 50;
+		var drawy = 20;
 		var initRandomSize = 10;
 		var randomSize = Math.ceil(initRandomSize / $("#svgNum")[0].value);
 		var splaytree, splaytreeCache, choose, drawroot, history, svg, svgNum;
@@ -107,17 +112,7 @@
 					//break; //comment this to make it available to deal with many numbers once
 				}
 			}
-			if (drawroot[choose] != null) {
-				drawroot[choose].remove();
-			}
-			drawroot[choose] = genDrawingTree(splaytree.root);
-			if (drawroot[choose] != null) {
-				drawroot[choose].getHlign();
-				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
-				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
-			}
-			$('#process' + choose).html(splaytree.process);
-			choose = (choose + 1) % svgNum;
+			drawTree(splaytree.process);
 			history += opRecord + "\n";
 		}
 		
@@ -146,6 +141,23 @@
 			if (right != null) root.appendright(right);
 			return root;
 		}
+		
+		function drawTree(output) {
+			if (drawroot[choose] != null) {
+				drawroot[choose].remove();
+			}
+			drawroot[choose] = genDrawingTree(splaytree.root);
+			if (drawroot[choose] != null) {
+				drawroot[choose].getHlign();
+				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
+				pos *= parseInt($("#svgWidth").val()) / 100;
+				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos	, drawy);
+			}
+			if (output != null) {
+				$('#process' + choose).html(output);
+			}
+			choose = (choose + 1) % svgNum;
+		}
 
 		function randomData() {
 			var output;
@@ -160,18 +172,7 @@
 				splaytreeCache.insert(num, true);
 				output += num + " ";
 			}
-			if (drawroot[choose] != null) {
-				drawroot[choose].remove();
-			}
-			drawroot[choose] = genDrawingTree(splaytree.root);
-			if (drawroot[choose] != null) {
-				drawroot[choose].getHlign();
-				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
-				drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
-			}
-			var divsvg = $('.divsvg');
-			divsvg[choose].getElementsByTagName('p')[0].textContent = output;
-			choose = (choose + 1) % svgNum;
+			drawTree(output);
 			history += output + "\n";
 		};
 		
@@ -185,14 +186,15 @@
 				$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');
 			}
 			divsvg = $('.divsvg');
-			var cssWidth = "50%"
-			switch(svgNum) {
-				case "1": cssWidth = "100%"; break;
-				case "3": cssWidth = "33%"; break;
-				case "4": cssWidth = "25%"; break;
-				case "5": cssWidth = "20%"; break;
-			}
+			var cssWidth = parseInt(100 / svgNum) + "%";
 			divsvg.css('width', cssWidth);
+			var svgWidth = $("#svgWidth");
+			svgWidth.empty();
+			svgWidth.append($("<option>").text(cssWidth).attr("selected", true));
+			for (var i = svgNum - 1; i >= 1; --i) {
+				var widthOption = parseInt(100 / i) + "%";
+				svgWidth.append($("<option>").text(widthOption));
+			}
 			splaytree = Splay();
 			splaytreeCache = Splay();
 			choose = 0;
@@ -219,6 +221,13 @@
 			$(".divsvg").css("height", value);
 		}
 		$("#svgHeight").change(updateSvgHeight);
+		
+		function updateSvgWidth() {
+			$(".divsvg").css("width", $("#svgWidth").val());
+			choose = (choose - 1 + svgNum) % svgNum;
+			drawTree();
+		}
+		$("#svgWidth").change(updateSvgWidth);
 		
 		$("#bbst").change(function() {
 			if ($("#bbst").attr("checked") != null) {
