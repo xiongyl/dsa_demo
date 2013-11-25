@@ -35,23 +35,26 @@ Node.prototype = {
 	isLeaf: function() {
 		return this.left == null && this.right == null;
 	},
-	draw: function(svg, x, y) {
+	draw: function(svg, x, y, scale) {
+		if (isNaN(parseInt(scale))) {
+			scale = 1;
+		}
 		this.getHlign();
 		if (this.element == null) {
-			var baseInterval = 30 * 2;
-			var vlign = 40;
+			var baseInterval = 30 * 2 * scale;
+			var vlign = 40 * scale;
 			if (this.left != null) {
 				var leftInterval = this.left.hlignr * baseInterval;
-				this.left.draw(svg, x + leftInterval * (0 - 0.5), y + vlign);
+				this.left.draw(svg, x + leftInterval * (0 - 0.5), y + vlign, scale);
 			}
 			if (this.right != null) {
 				var rightInterval = this.right.hlignl * baseInterval;
-				this.right.draw(svg, x + rightInterval * (1 - 0.5), y + vlign);
+				this.right.draw(svg, x + rightInterval * (1 - 0.5), y + vlign, scale);
 			}
 			this.element = svg.append("g");
 			var lineStroke = "#1b1d1e";
-			var lineStrokeWidth = "5px";
-			var vlignOffset = 2.5;
+			var lineStrokeWidth = 5 * scale + "px";
+			var vlignOffset = 2.5 * scale;
 			this.element.append("line")
 					.attr("x1", 0).attr("y1", 0)
 					.attr("x2", 0)
@@ -82,15 +85,16 @@ Node.prototype = {
 				.delay(0)
 				.attr("transform", "translate(" + x + "," + (y + 30) + ")");
 			this.element.append("circle")
-						.attr("r", 18)
+						.attr("r", 18 * scale)
 						.style("stroke", "#ccc")
-						.style("stroke-width", "3px")
+						.style("stroke-width", 3 * scale + "px")
 						.style("fill", "#1b1d1e");
 			txt = this.element.append("text")
-				.attr("dy", "0.25em")
+				.attr("dy", 0.25 * scale + "em")
 				.style("stroke", "#fff")
 				.style("text-weight", "bold")
 				.style("font-family", "Consolas")
+				.style("font-size", 20 * scale)
 				.style("text-anchor", "middle")
 				.style("fill", "#fff")
 				.text(this.value);
