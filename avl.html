@@ -60,7 +60,7 @@
 	<script type="text/javascript">
 		var drawy = 20;
 		var initRandomSize = 10;
-		var randomSize = Math.ceil(initRandomSize / $("#svgNum")[0].value);
+		var randomSize = Math.ceil(initRandomSize / $("#svgNum").val());
 		var avltree, avltreeCache, choose, drawroot, history, svg, svgNum;
 		start();
 		
@@ -224,7 +224,7 @@
 		
 		function updateSvgWidth() {
 			$(".divsvg").css("width", $("#svgWidth").val());
-			choose = (choose - 1 + svgNum) % svgNum;
+			choose = (choose - 1 + parseInt(svgNum)) % svgNum;
 			drawTree();
 		}
 		$("#svgWidth").change(updateSvgWidth);
