@@ -17,6 +17,20 @@
 	<div id="input" align="center">
 		<p id="svgArg">
 			Screen:
+			Step No.:
+			<select id="svgNum">
+				<option>1</option>
+				<option selected>2</option>
+				<option>3</option>
+				<option>4</option>
+			</select>
+			Scale:
+			<select id="treeScale">
+				<option>0.5</option>
+				<option>0.75</option>
+				<option selected>1</option>
+				<option>1.25</option>
+			</select>
 			Width:
 			<select id="svgWidth">
 				<option selected>50%</option>
@@ -27,13 +41,6 @@
 				<option selected>50%</option>
 				<option>75%</option>
 				<option>100%</option>
-			</select>
-			Step Number:
-			<select id="svgNum">
-				<option>1</option>
-				<option selected>2</option>
-				<option>3</option>
-				<option>4</option>
 			</select>
 		</p>
 		<p>
@@ -151,7 +158,7 @@
 				drawroot[choose].getHlign();
 				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
 				pos *= parseInt($("#svgWidth").val()) / 100;
-				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos	, drawy);
+				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos	, drawy * $("#treeScale").val(), $("#treeScale").val());
 			}
 			if (output != null) {
 				$('#process' + choose).html(output);
@@ -229,6 +236,12 @@
 		}
 		$("#svgWidth").change(updateSvgWidth);
 		
+		function updateTreeScale() {
+			choose = (choose - 1 + parseInt(svgNum)) % svgNum;
+			drawTree();
+		}
+		$("#treeScale").change(updateTreeScale);
+		
 		$("#bbst").change(function() {
 			if ($("#bbst").attr("checked") != null) {
 				splaytree = splaytreeCache.clone();
@@ -236,18 +249,7 @@
 					return;
 				}
 				var output = "BBST choosed";
-				if (drawroot[choose] != null) {
-					drawroot[choose].remove();
-				}
-				drawroot[choose] = genDrawingTree(splaytree.root);
-				if (drawroot[choose] != null) {
-					drawroot[choose].getHlign();
-					var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
-					drawroot[choose].draw(svg[choose], document.body.clientWidth / svgNum * pos	, drawy);
-				}
-				var divsvg = $('.divsvg');
-				divsvg[choose].getElementsByTagName('p')[0].textContent = output;
-				choose = (choose + 1) % svgNum;
+				drawTree(output);
 				history += output + "\n";
 			}
 		})

@@ -94,7 +94,7 @@ Node.prototype = {
 				.style("stroke", "#fff")
 				.style("text-weight", "bold")
 				.style("font-family", "Consolas")
-				.style("font-size", 20 * scale)
+				.style("font-size", 20 * scale + "px")
 				.style("text-anchor", "middle")
 				.style("fill", "#fff")
 				.text(this.value);
