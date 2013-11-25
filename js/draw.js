@@ -103,6 +103,7 @@ Node.prototype = {
 	remove: function() {
 		if (this.element != null) {
 			this.element.remove();
+			this.element = null;
 		}
 		if (this.left != null) {
 			this.left.remove();

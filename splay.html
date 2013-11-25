@@ -17,7 +17,7 @@
 	<div id="input" align="center">
 		<p id="svgArg">
 			Screen:
-			Step No.:
+			#Step:
 			<select id="svgNum">
 				<option>1</option>
 				<option selected>2</option>
@@ -26,9 +26,9 @@
 			</select>
 			Scale:
 			<select id="treeScale">
-				<option>0.5</option>
+				<option>0.50</option>
 				<option>0.75</option>
-				<option selected>1</option>
+				<option selected>1.00</option>
 				<option>1.25</option>
 			</select>
 			Width:
@@ -158,12 +158,23 @@
 				drawroot[choose].getHlign();
 				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
 				pos *= parseInt($("#svgWidth").val()) / 100;
-				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos	, drawy * $("#treeScale").val(), $("#treeScale").val());
+				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos, drawy * $("#treeScale").val(), $("#treeScale").val());
 			}
 			if (output != null) {
 				$('#process' + choose).html(output);
 			}
 			choose = (choose + 1) % svgNum;
+		}
+		
+		function reDrawTrees() {
+			for (var i = 0; i < svgNum; ++i) {
+				if (drawroot[i] != null) {
+					drawroot[i].remove();
+					var pos = drawroot[i].hlignl / (drawroot[i].hlignl + drawroot[i].hlignr);
+					pos *= parseInt($("#svgWidth").val()) / 100;
+					drawroot[i].draw(svg[i], document.body.clientWidth * pos, drawy * $("#treeScale").val(), $("#treeScale").val());
+				}
+			}
 		}
 
 		function randomData() {
@@ -231,14 +242,12 @@
 		
 		function updateSvgWidth() {
 			$(".divsvg").css("width", $("#svgWidth").val());
-			choose = (choose - 1 + parseInt(svgNum)) % svgNum;
-			drawTree();
+			reDrawTrees();
 		}
 		$("#svgWidth").change(updateSvgWidth);
 		
 		function updateTreeScale() {
-			choose = (choose - 1 + parseInt(svgNum)) % svgNum;
-			drawTree();
+			reDrawTrees();
 		}
 		$("#treeScale").change(updateTreeScale);
 		
