@@ -89,12 +89,13 @@ Node.prototype = {
 						.style("stroke", "#ccc")
 						.style("stroke-width", 3 * scale + "px")
 						.style("fill", "#1b1d1e");
+			var lenScale = 2 / (Math.floor(Math.log(this.value) / Math.LN10) + 1);
 			txt = this.element.append("text")
 				.attr("dy", 0.25 * scale + "em")
 				.style("stroke", "#fff")
 				.style("text-weight", "bold")
 				.style("font-family", "Consolas")
-				.style("font-size", 20 * scale + "px")
+				.style("font-size", 20 * scale * lenScale + "px")
 				.style("text-anchor", "middle")
 				.style("fill", "#fff")
 				.text(this.value);
