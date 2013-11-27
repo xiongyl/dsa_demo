@@ -89,7 +89,7 @@ Node.prototype = {
 						.style("stroke", "#ccc")
 						.style("stroke-width", 3 * scale + "px")
 						.style("fill", "#1b1d1e");
-			var lenScale = 2 / (Math.floor(Math.log(this.value) / Math.LN10) + 1);
+			var lenScale = 2 / Math.max(2, (Math.floor(Math.log(this.value) / Math.LN10) + 1));
 			txt = this.element.append("text")
 				.attr("dy", 0.25 * scale + "em")
 				.style("stroke", "#fff")

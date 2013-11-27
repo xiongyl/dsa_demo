@@ -46,7 +46,7 @@
 		<p>
 			<input id="bbst" type="checkbox" checked>BBST
 			<button id="history">History</button>
-			<input id="num" type="text" maxlength="100" autocomplete="off">
+			<input id="num" type="text" autocomplete="off">
 			<button id="insert">Insert</button>
 			<button id="remove">Remove</button>
 			<select id="removeSwap">
@@ -64,11 +64,13 @@
 	<script type="text/javascript" src="js/draw.js"></script>
 	<script type="text/javascript" src="js/treenode.js"></script>
 	<script type="text/javascript" src="js/avl.js"></script>
+	<script type="text/javascript" src="js/bst.js"></script>
 	<script type="text/javascript">
 		var drawy = 20;
 		var initRandomSize = 10;
 		var randomSize = Math.ceil(initRandomSize / $("#svgNum").val());
-		var avltree, avltreeCache, choose, drawroot, history, svg, svgNum;
+		var thistree, avlCache, bstCache;
+		var choose, drawroot, history, svg, svgNum;
 		start();
 		
 		function func(op) {
@@ -77,16 +79,16 @@
 			$("#num").attr("value", "");
 			var opRecord;
 			if ($("#bbst").attr("checked") != null) {
-				opRecord = "bbst " + op + " ";
+				opRecord = "AVL " + op + " ";
 			}else {
-				opRecord = op + " ";
+				opRecord = "BST " + op + " ";
 			}
 			if (op == "Remove") {
 				opRecord += "(" + $('#removeSwap').val() + ") ";
 			}
 			if (op == "RemoveAll") {
-				avltree.removeAll();
-				avltreeCache.removeAll();
+				bstCache.removeAll();
+				avlCache.removeAll();
 			}else {
 				if (input == null) return;
 				input = input.split(" ");
@@ -104,22 +106,22 @@
 				for (var i = 0; i < nums.length; ++i) {
 					var num = nums[i];
 					if (op == "Insert") {
-						avltree.insert(num, $('#bbst').attr("checked") != null);
-						avltreeCache.insert(num, true);
+						bstCache.insert(num);
+						avlCache.insert(num);
 					}
 					if (op == "Remove") {
-						avltree.remove(num, $('#removeSwap').val(), $('#bbst').attr("checked") != null);
-						avltreeCache.remove(num, $('removeSwap').val(), true);
+						bstCache.remove(num, $('#removeSwap').val());
+						avlCache.remove(num, $('removeSwap').val());
 					}
 					if (op == "Search") {
-						avltree.search(num, $('#bbst').attr("checked") != null);
-						avltreeCache.search(num, true);
+						bstCache.search(num);
+						avlCache.search(num);
 					}
 					opRecord += num + " ";
 					//break; //comment this to make it available to deal with many numbers once
 				}
 			}
-			drawTree(avltree.process);
+			drawTree(thistree.process);
 			history += opRecord + "\n";
 		}
 		
@@ -153,7 +155,7 @@
 			if (drawroot[choose] != null) {
 				drawroot[choose].remove();
 			}
-			drawroot[choose] = genDrawingTree(avltree.root);
+			drawroot[choose] = genDrawingTree(thistree.root);
 			if (drawroot[choose] != null) {
 				drawroot[choose].getHlign();
 				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
@@ -180,14 +182,14 @@
 		function randomData() {
 			var output;
 			if ($("#bbst").attr("checked") != null) {
-				output = "bbst Insert ";
+				output = "AVL Insert ";
 			}else {
-				output = "Insert ";
+				output = "BST Insert ";
 			}
 			for (var i = 0; i < randomSize; ++i) {
 				var num = Math.ceil(Math.random() * 100);
-				avltree.insert(num, $('#bbst').attr("checked") != null);
-				avltreeCache.insert(num, true);
+				bstCache.insert(num);
+				avlCache.insert(num);
 				output += num + " ";
 			}
 			drawTree(output);
@@ -213,8 +215,13 @@
 				var widthOption = parseInt(100 / i) + "%";
 				svgWidth.append($("<option>").text(widthOption));
 			}
-			avltree = Avl();
-			avltreeCache = Avl();
+			bstCache = Bst();
+			avlCache = Avl();
+			if ($("#bbst").attr("checked") != null) {
+				thistree = avlCache;
+			}else {
+				thistree = bstCache;
+			}
 			choose = 0;
 			drawroot = [];
 			svg = [];
@@ -253,11 +260,14 @@
 		
 		$("#bbst").change(function() {
 			if ($("#bbst").attr("checked") != null) {
-				avltree = avltreeCache.clone();
-				if (avltree.count < 2) {
-					return;
-				}
-				var output = "BBST choosed";
+				thistree = avlCache;
+				var output = "AVL choosed";
+				drawTree(output);
+				history += output + "\n";
+			}else {
+				thistree = bstCache;
+				avlCache.cloneTo(bstCache);
+				var output = "BST choosed";
 				drawTree(output);
 				history += output + "\n";
 			}

@@ -14,12 +14,12 @@ function Splay() {
 		return my.root.height;
 	}
 	
-	my.insert = function(value, bbst) {
+	my.insert = function(value) {
 		if (my.root == null) {
 			my.root = TreeNode(value, my.count ++);
 			my.process = "New root [" + value + "] created. ";
 		} else {
-			my.process = "Inserting [" + value + "]. ";
+			my.process = "Splay Inserting [" + value + "]. ";
 			var u = my.root, v = null, w = null;
 			while (u != null) {
 				v = u;
@@ -35,17 +35,6 @@ function Splay() {
 					my.process += "[" + value + "] > [" + u.value + "]. "
 					u = u.right;
 				}
-			}
-			if (bbst == false) {
-				if (u != null) {
-					return;
-				}
-				var node = TreeNode(value, my.count ++);
-				if (v.value > value) v.left = node;
-				else v.right = node;
-				node.father = v;
-				my.process += "[" + value + "] inserted. ";
-				return;
 			}
 			my.process += v.splay();
 			my.root = v;
@@ -74,7 +63,7 @@ function Splay() {
 		}
 	}
 	
-	my.remove = function(value, swap, bbst) {
+	my.remove = function(value, swap) {
 		if (swap == "rand") {
 			if (Math.random() > 0.5) {
 				swap = "succ";
@@ -85,13 +74,9 @@ function Splay() {
 		if (swap != "succ" && swap != "pred") {
 			swap = "pred";
 		}
-		my.process = "Removing [" + value + "]. ";
+		my.process = "Splay Removing [" + value + "]. ";
 		if (my.root == null) {
 			my.process += "[" + value + "] not found. ";
-			return;
-		}
-		if (bbst == false) {
-			bstRemove(value, swap);
 			return;
 		}
 		var u = my.root, v = null, w = null;
@@ -162,8 +147,8 @@ function Splay() {
 		my.process += "[" + value + "] removed. ";
 	}
 	
-	my.search = function(value, bbst) {
-		my.process = "Searching [" + value + "]. ";
+	my.search = function(value) {
+		my.process = "Splay Searching [" + value + "]. ";
 		var u = my.root;
 		var v = null;
 		while (u != null) {
@@ -184,7 +169,7 @@ function Splay() {
 		if (u == null) {
 			my.process += "[" + value + "] not found. ";
 		}
-		if (v != null && bbst == true) {
+		if (v != null) {
 			my.process += v.splay();
 			my.root = v;			
 		}
@@ -209,96 +194,12 @@ function Splay() {
 		return newtree;
 	}
 	
-	function bstRemove(value, swap) {
-		var u = my.root, v = null, w = null;
-		while (u != null) {
-			if (value == u.value) {
-				my.process += "[" + value + "] = [" + u.value + "]. ";
-				break;
-			}
-			if (value < u.value) {
-				my.process += "[" + value + "] < [" + u.value + "]. ";
-				u = u.left;
-			}else{
-				my.process += "[" + value + "] > [" + u.value + "]. "
-				u = u.right;
-			}
+	my.cloneTo = function(anotherTree) {
+		anotherTree.count = my.count;
+		anotherTree.process = my.process;
+		if (my.root != null) {
+			anotherTree.root = my.root.clone();
 		}
-		if (u == null) {
-			my.process += "[" + value + "] not found. ";
-			return;
-		}
-		if (swap == "pred") {
-			while (u.left != null && u.right != null) {
-				w = u.left;
-				while (w != null) {
-					v = w;
-					w = w.right;
-				}
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-				u = v;
-			}
-		}else {
-			while (u.left != null && u.right != null) {
-				w = u.right;
-				while (w != null) {
-					v = w;
-					w = w.left;
-				}
-				u.value = v.value;
-				u.id = v.id;
-				my.process += "Swaping with [" + v.value + "]. ";
-				u = v;
-			}
-		}
-		if (u.left != null) {
-			v = u.left;
-			v.father = u.father;
-			if (u.isLeft()) {
-				u.father.left = v;
-			}else if(u.isRight()) {
-				u.father.right = v;
-			}
-			u = v.father;
-			while (u != null) {
-				u.update();
-				v = u;
-				u = u.father;
-			}
-			my.root = v;
-		}else if (u.right != null) {
-			v = u.right;
-			v.father = u.father;
-			if (u.isLeft()) {
-				u.father.left = v;
-			}else if(u.isRight()) {
-				u.father.right = v;
-			}
-			u = v.father;
-			while (u != null) {
-				u.update();
-				v = u;
-				u = u.father;
-			}
-			my.root = v;
-		}else {
-			if (u.isLeft()) {
-				u.father.left = null;
-			}else if (u.isRight()) {
-				u.father.right = null;
-			}
-			u = u.father;
-			v = u;
-			while (u != null) {
-				u.update();
-				v = u;
-				u = u.father;
-			}
-			my.root = v;
-		}
-		my.process += "[" + value + "] removed. ";
 	}
 	return my;
 }
