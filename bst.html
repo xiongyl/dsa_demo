@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>   
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+	<META http-equiv="X-UA-Compatible" content="IE=9" > </META>
+	<title>Binary Search Trees</title>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /> 
+	<link rel="stylesheet" href="css/avl.css"/>
+</head>
+
+<body>
+	<h1 align="center">Binary Search Trees</h1>
+	<div id="input" align="center">
+		<h2 id="chooseTree">
+			<input type="radio" name="treeType" id="chooseBst" value="BST"><label for="chooseBst">BST</label>
+			<input type="radio" name="treeType" id="chooseAvl" value="AVL" checked><label for="chooseAvl">AVL</label>
+			<input type="radio" name="treeType" id="chooseSplay" value="Splay"><label for="chooseSplay">Splay</label>
+		</h2>
+		<p id="svgArg">
+			Screen:
+			#Step:
+			<select id="svgNum">
+				<option>1</option>
+				<option selected>2</option>
+				<option>3</option>
+				<option>4</option>
+			</select>
+			Scale:
+			<select id="treeScale">
+				<option>0.50</option>
+				<option>0.75</option>
+				<option selected>1.00</option>
+				<option>1.25</option>
+			</select>
+			Width:
+			<select id="svgWidth">
+				<option selected>50%</option>
+				<option>100%</option>
+			</select>
+			Height:
+			<select id="svgHeight">
+				<option selected>50%</option>
+				<option>75%</option>
+				<option>100%</option>
+			</select>
+		</p>
+		<p>
+			<button id="history">History</button>
+			<input id="num" type="text" autocomplete="off">
+			<button id="insert">Insert</button>
+			<button id="remove">Remove</button>
+			<select id="removeSwap">
+				<option selected>pred</option>
+				<option>succ</option>
+				<option>rand</option>
+			</select>
+			<button id="search">Search</button>
+			<button id="removeAll">RemoveAll</button>
+		</p>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/d3.v3.min.js"></script>
+	<script type="text/javascript" src="js/draw.js"></script>
+	<script type="text/javascript" src="js/treenode.js"></script>
+	<script type="text/javascript" src="js/avl.js"></script>
+	<script type="text/javascript" src="js/bst.js"></script>
+	<script type="text/javascript" src="js/splay.js"></script>
+	<script type="text/javascript">
+		var drawy = 20;
+		var initRandomSize = 10;
+		var randomSize = Math.ceil(initRandomSize / $("#svgNum").val());
+		var thistree, avlCache, bstCache, splayCache;
+		var choose, drawroot, history, svg, svgNum;
+		start();
+		
+		function func(op) {
+			$("#svgNum option[value=" + svgNum + "]").attr("selected", "true");
+			var input = $("#num").val();
+			$("#num").attr("value", "");
+			var opRecord;
+			opRecord = $("input[name='treeType']:checked").val() + " " + op + " ";
+			if (op == "Remove") {
+				opRecord += "(" + $('#removeSwap').val() + ") ";
+			}
+			if (op == "RemoveAll") {
+				bstCache.removeAll();
+				avlCache.removeAll();
+				splayCache.removeAll();
+			}else {
+				if (input == null) return;
+				input = input.split(" ");
+				var nums = [];
+				for (var i = 0; i < input.length; ++i) {
+					var num = parseInt(input[i]);
+					if (!isNaN(num)) {
+						nums.push(num);
+					}
+				}
+				if (nums.length == 0) {
+					//return; //uncomment this to make it unavailable to add random number
+					nums.push(Math.ceil(Math.random() * 100));
+				}
+				for (var i = 0; i < nums.length; ++i) {
+					var num = nums[i];
+					if (op == "Insert") {
+						bstCache.insert(num);
+						avlCache.insert(num);
+						splayCache.insert(num);
+					}
+					if (op == "Remove") {
+						bstCache.remove(num, $('#removeSwap').val());
+						avlCache.remove(num, $('removeSwap').val());
+						splayCache.remove(num, $('removeSwap').val());
+					}
+					if (op == "Search") {
+						bstCache.search(num);
+						avlCache.search(num);
+						splayCache.search(num);
+					}
+					opRecord += num + " ";
+					//break; //comment this to make it available to deal with many numbers once
+				}
+			}
+			drawTree(thistree.process);
+			history += opRecord + "\n";
+		}
+		
+		$("#insert").click(function() {
+			func("Insert");
+		})
+
+		$("#remove").click(function() {
+			func("Remove");
+		})
+		
+		$("#search").click(function() {
+			func("Search");
+		})
+		
+		$("#removeAll").click(function() {
+			func("RemoveAll");
+		})
+
+		function genDrawingTree(node) {
+			if (node == null) return null;
+			var left = genDrawingTree(node.left);
+			var right = genDrawingTree(node.right);
+			var root = new Node(node.value);
+			if (left != null) root.appendleft(left);
+			if (right != null) root.appendright(right);
+			return root;
+		}
+		
+		function drawTree(output) {
+			if (drawroot[choose] != null) {
+				drawroot[choose].remove();
+			}
+			drawroot[choose] = genDrawingTree(thistree.root);
+			if (drawroot[choose] != null) {
+				drawroot[choose].getHlign();
+				var pos = drawroot[choose].hlignl / (drawroot[choose].hlignl + drawroot[choose].hlignr);
+				pos *= parseInt($("#svgWidth").val()) / 100;
+				drawroot[choose].draw(svg[choose], document.body.clientWidth * pos, drawy * $("#treeScale").val(), $("#treeScale").val());
+			}
+			if (output != null) {
+				$('#process' + choose).html(output);
+			}
+			choose = (choose + 1) % svgNum;
+		}
+		
+		function reDrawTrees() {
+			for (var i = 0; i < svgNum; ++i) {
+				if (drawroot[i] != null) {
+					drawroot[i].remove();
+					var pos = drawroot[i].hlignl / (drawroot[i].hlignl + drawroot[i].hlignr);
+					pos *= parseInt($("#svgWidth").val()) / 100;
+					drawroot[i].draw(svg[i], document.body.clientWidth * pos, drawy * $("#treeScale").val(), $("#treeScale").val());
+				}
+			}
+		}
+
+		function randomData() {
+			var output;
+			output = $("input[name='treeType']:checked").val() + " Insert ";
+			for (var i = 0; i < randomSize; ++i) {
+				var num = Math.ceil(Math.random() * 100);
+				bstCache.insert(num);
+				avlCache.insert(num);
+				splayCache.insert(num);
+				output += num + " ";
+			}
+			drawTree(output);
+			history += output + "\n";
+		};
+		
+		function start() {
+			svgNum = $('#svgNum').val();
+			var divsvg = $('.divsvg');
+			if (divsvg) {
+				divsvg.remove();
+			}
+			for (var i = 0; i < svgNum; ++i) {
+				$('body').append('<div class="divsvg" id="divsvg' + i + '"align="center"></div>');
+			}
+			divsvg = $('.divsvg');
+			var cssWidth = parseInt(100 / svgNum) + "%";
+			divsvg.css('width', cssWidth);
+			var svgWidth = $("#svgWidth");
+			svgWidth.empty();
+			svgWidth.append($("<option>").text(cssWidth).attr("selected", true));
+			for (var i = svgNum - 1; i >= 1; --i) {
+				var widthOption = parseInt(100 / i) + "%";
+				svgWidth.append($("<option>").text(widthOption));
+			}
+			bstCache = Bst();
+			avlCache = Avl();
+			splayCache = Splay();
+			var treeType = $("input[name='treeType']:checked").val();
+			if (treeType == "AVL") {
+				thistree = avlCache;
+			}else if (treeType == "Splay"){
+				thistree = splayCache;
+			}else {
+				thistree = bstCache;
+			}
+			choose = 0;
+			drawroot = [];
+			svg = [];
+			history = "";
+			for (var i = 0; i < divsvg.length; ++i) {
+				svg.push(d3.select('#divsvg'+i).append('svg'));
+				$('#divsvg'+i).append('<p class="process" id="process' + i + '"></p>');
+			}
+			randomSize = Math.ceil(initRandomSize / svgNum);
+			randomData();
+			updateSvgHeight();
+		}
+		
+		$("#svgNum").change(start);
+		
+		$("#history").click(function() {
+			alert(history);
+		});
+		
+		function updateSvgHeight() {
+			value = $("#svgHeight").val();
+			$(".divsvg").css("height", value);
+		}
+		$("#svgHeight").change(updateSvgHeight);
+		
+		function updateSvgWidth() {
+			$(".divsvg").css("width", $("#svgWidth").val());
+			reDrawTrees();
+		}
+		$("#svgWidth").change(updateSvgWidth);
+		
+		function updateTreeScale() {
+			reDrawTrees();
+		}
+		$("#treeScale").change(updateTreeScale);
+		
+		$("input[name='treeType']").click(function() {
+			if (this.value == "AVL") {
+				if (thistree == avlCache) return;
+				thistree = avlCache;
+			}
+			if (this.value == "Splay") {
+				if (thistree == splayCache) return;
+				thistree = splayCache;
+			}
+			if (this.value == "BST") {
+				if (thistree == bstCache) return;
+				thistree.cloneTo(bstCache);
+				thistree = bstCache;
+			}
+			var output = this.value + " choosed";
+			drawTree(output);
+			history += output + "\n";
+		})
+	</script>
+</body>
+</html>
